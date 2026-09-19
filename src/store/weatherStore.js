@@ -146,7 +146,7 @@ export const useWeatherStore = create(
 
           set({
             weather: weatherData.value,
-            airQuality: aqData.status === 'fulfilled' ? aqData.value : null,
+            airQuality: aqData.status === 'fulfilled' && aqData.value ? aqData.value : { current: null, error: 'AQI_UNAVAILABLE' },
             loading: false,
             error: null,
           });

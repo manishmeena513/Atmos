@@ -123,6 +123,26 @@ export function RadarSection() {
       maxZoom: 18,
       attributionControl: false,
       cooperativeGestures: true,
+      transformRequest: (url, resourceType) => {
+        if (resourceType === 'Tile' && url.includes('rainviewer.com')) {
+          // Prevent requesting unsupported RainViewer zoom levels (> 7)
+          const match = url.match(/\/256\/(\d+)\/(\d+)\/(\d+)\//);
+          if (match) {
+            const z = parseInt(match[1], 10);
+            if (z > 7) {
+              const x = parseInt(match[2], 10);
+              const y = parseInt(match[3], 10);
+              const shift = z - 7;
+              const clampedX = Math.floor(x / Math.pow(2, shift));
+              const clampedY = Math.floor(y / Math.pow(2, shift));
+              return {
+                url: url.replace(`/${z}/${x}/${y}/`, `/7/${clampedX}/${clampedY}/`),
+              };
+            }
+          }
+        }
+        return { url };
+      },
     });
 
     mapRef.current = map;
@@ -222,7 +242,7 @@ export function RadarSection() {
 
     playIntervalRef.current = setInterval(() => {
       setCurrentFrameIdx((prev) => (prev + 1) % radarData.frames.length);
-    }, 800); // 800ms per frame for smooth Doppler movement
+    }, 800); // 800ms per frame for smooth radar playback
 
     return () => {
       if (playIntervalRef.current) clearInterval(playIntervalRef.current);

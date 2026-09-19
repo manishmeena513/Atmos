@@ -94,12 +94,15 @@ export async function fetchAirQuality(lat, lon) {
     }
 
     const data = await response.json();
+    if (data.error || !data.current) {
+      return { current: null, error: 'AQI_UNAVAILABLE' };
+    }
     setCached(cacheKey, data);
     return data;
   } catch (err) {
     clearTimeout(timeoutId);
     console.warn('Open-Meteo Air Quality telemetry unavailable:', err.message);
-    return null;
+    return { current: null, error: 'AQI_UNAVAILABLE' };
   }
 }
 

@@ -47,7 +47,8 @@ export function AirQualitySection() {
   const airQuality = useWeatherStore((s) => s.airQuality);
 
   const curr = airQuality?.current;
-  const aqi = curr?.european_aqi ?? curr?.us_aqi ?? null;
+  const rawAqi = curr?.european_aqi ?? curr?.us_aqi ?? null;
+  const aqi = typeof rawAqi === 'number' && !isNaN(rawAqi) && isFinite(rawAqi) ? rawAqi : null;
 
   if (!curr || aqi === null) {
     return (
@@ -82,7 +83,7 @@ export function AirQualitySection() {
 
         <div className="mt-4 pt-3 border-t border-white/5 text-[11px] text-slate-500 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
           <span>Source: Open-Meteo Air Quality Model</span>
-          <span>Status: Telemetry Unavailable</span>
+          <span>Status: AQI Unavailable</span>
         </div>
       </div>
     );
@@ -90,11 +91,21 @@ export function AirQualitySection() {
 
   const aqiInfo = getAqiCategory(aqi);
 
+  const formatPollutant = (val) => {
+    if (typeof val !== 'number' || isNaN(val) || !isFinite(val)) return 'N/A';
+    return `${val.toFixed(1)} µg/m³`;
+  };
+
+  const getPollutantStatus = (val, threshold) => {
+    if (typeof val !== 'number' || isNaN(val) || !isFinite(val)) return 'N/A';
+    return val > threshold ? 'Elevated' : 'Clean';
+  };
+
   const pollutants = [
-    { name: 'PM2.5', value: curr.pm2_5 != null ? `${curr.pm2_5.toFixed(1)} µg/m³` : 'N/A', status: curr.pm2_5 != null ? (curr.pm2_5 > 25 ? 'Elevated' : 'Clean') : 'N/A' },
-    { name: 'PM10', value: curr.pm10 != null ? `${curr.pm10.toFixed(1)} µg/m³` : 'N/A', status: curr.pm10 != null ? (curr.pm10 > 50 ? 'Elevated' : 'Clean') : 'N/A' },
-    { name: 'Ozone (O₃)', value: curr.ozone != null ? `${curr.ozone.toFixed(1)} µg/m³` : 'N/A', status: curr.ozone != null ? 'Normal' : 'N/A' },
-    { name: 'Nitrogen (NO₂)', value: curr.nitrogen_dioxide != null ? `${curr.nitrogen_dioxide.toFixed(1)} µg/m³` : 'N/A', status: curr.nitrogen_dioxide != null ? 'Low' : 'N/A' },
+    { name: 'PM2.5', value: formatPollutant(curr.pm2_5), status: getPollutantStatus(curr.pm2_5, 25) },
+    { name: 'PM10', value: formatPollutant(curr.pm10), status: getPollutantStatus(curr.pm10, 50) },
+    { name: 'Ozone (O₃)', value: formatPollutant(curr.ozone), status: typeof curr.ozone === 'number' && !isNaN(curr.ozone) ? 'Normal' : 'N/A' },
+    { name: 'Nitrogen (NO₂)', value: formatPollutant(curr.nitrogen_dioxide), status: typeof curr.nitrogen_dioxide === 'number' && !isNaN(curr.nitrogen_dioxide) ? 'Low' : 'N/A' },
   ];
 
   return (

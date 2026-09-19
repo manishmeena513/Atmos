@@ -60,7 +60,7 @@ export function WeatherInsights() {
           <div>
             <h4 className="text-sm font-semibold text-white">Calm & Balanced Conditions</h4>
             <p className="text-xs text-slate-300 mt-0.5">
-              No extreme weather anomalies detected. Temperature, air quality, and wind are within optimal comfort thresholds.
+              No extreme weather anomalies detected. Atmospheric metrics and wind speeds are within optimal comfort thresholds.
             </p>
           </div>
         </div>
