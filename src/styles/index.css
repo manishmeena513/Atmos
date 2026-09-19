@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+  
+  html {
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: clip;
+  }
+
+  body {
+    background-color: #080B10;
+    color: #F1F5F9;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    overflow-x: clip;
+    width: 100%;
+    min-height: 100%;
+  }
+
+  #root {
+    width: 100%;
+    min-height: 100vh;
+  }
+}
+
+/* Custom Scrollbar for Atmospheric Minimal Look */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(8, 11, 16, 0.6);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+/* Glassmorphic card styling utilities */
+.glass-panel {
+  background: rgba(15, 21, 33, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel-hover:hover {
+  background: rgba(22, 30, 48, 0.65);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.5);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Custom Range Slider Thumb Styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  touch-action: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 22px;
+  width: 22px;
+  border-radius: 50%;
+  background: #38BDF8;
+  border: 2.5px solid #FFFFFF;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.7);
+  cursor: ew-resize;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  touch-action: none;
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(1.25);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.95);
+}
+
+input[type="range"]::-moz-range-thumb {
+  height: 22px;
+  width: 22px;
+  border-radius: 50%;
+  background: #38BDF8;
+  border: 2.5px solid #FFFFFF;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.7);
+  cursor: ew-resize;
+}
+
+/* Leaflet dark theme override */
+.leaflet-container {
+  background: #090e18 !important;
+  font-family: inherit;
+  border-radius: 0.75rem;
+}
+
+.leaflet-tile {
+  filter: brightness(0.7) invert(1) contrast(1.2) hue-rotate(180deg) saturate(0.3);
+}
+
+.leaflet-control-zoom a {
+  background: rgba(15, 21, 33, 0.85) !important;
+  color: #fff !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(8px);
+}
+
+.leaflet-control-attribution {
+  background: rgba(8, 11, 16, 0.75) !important;
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-size: 10px !important;
+}
