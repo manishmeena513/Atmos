@@ -13,62 +13,13 @@ function latLonToVector3(lat, lon, radius) {
   return new THREE.Vector3(x, y, z);
 }
 
-// Procedural fallback texture generator if network/assets fail
-function createFallbackTexture(type) {
-  const canvas = document.createElement('canvas');
-  canvas.width = 1024;
-  canvas.height = 512;
-  const ctx = canvas.getContext('2d');
-
-  if (type === 'day') {
-    const grad = ctx.createLinearGradient(0, 0, 0, 512);
-    grad.addColorStop(0, '#0a1a33');
-    grad.addColorStop(0.5, '#12335f');
-    grad.addColorStop(1, '#0a1a33');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 1024, 512);
-    ctx.fillStyle = '#1e4028';
-    ctx.beginPath();
-    ctx.arc(300, 200, 140, 0, Math.PI * 2);
-    ctx.arc(600, 260, 180, 0, Math.PI * 2);
-    ctx.fill();
-  } else if (type === 'night') {
-    ctx.fillStyle = '#010308';
-    ctx.fillRect(0, 0, 1024, 512);
-    ctx.fillStyle = '#FDE047';
-    for (let i = 0; i < 600; i++) {
-      ctx.fillRect(Math.random() * 1024, 100 + Math.random() * 300, 1.5, 1.5);
-    }
-  } else if (type === 'clouds') {
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, 1024, 512);
-    ctx.fillStyle = '#ffffff';
-    ctx.filter = 'blur(16px)';
-    for (let i = 0; i < 24; i++) {
-      ctx.beginPath();
-      ctx.ellipse(Math.random() * 1024, 100 + Math.random() * 300, 70, 25, 0, 0, Math.PI * 2);
-      ctx.fill();
-    }
-  } else {
-    // specular
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, 1024, 512);
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, 1024, 512);
-  }
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.ClampToEdgeWrapping;
-  return texture;
-}
-
 export function WeatherGlobe() {
   const containerRef = useRef(null);
   const location = useWeatherStore((s) => s.location);
   const favorites = useWeatherStore((s) => s.favorites);
 
   const [autoRotate, setAutoRotate] = useState(true);
+  const [textureError, setTextureError] = useState(false);
   const cameraRef = useRef(null);
 
   useEffect(() => {
@@ -98,7 +49,7 @@ export function WeatherGlobe() {
     // 3. Load NASA Blue Marble High-Res Local Textures
     const textureLoader = new THREE.TextureLoader();
 
-    const loadTexture = (path, type) =>
+    const loadTexture = (path) =>
       textureLoader.load(
         path,
         (tex) => {
@@ -107,13 +58,16 @@ export function WeatherGlobe() {
           tex.needsUpdate = true;
         },
         undefined,
-        () => createFallbackTexture(type)
+        (err) => {
+          console.warn(`NASA Earth texture load failure at ${path}:`, err);
+          setTextureError(true);
+        }
       );
 
-    const dayTexture = loadTexture('/textures/earth/earth_day_2048.jpg', 'day');
-    const nightTexture = loadTexture('/textures/earth/earth_lights_2048.png', 'night');
-    const cloudsTexture = loadTexture('/textures/earth/earth_clouds_2048.png', 'clouds');
-    const specularTexture = loadTexture('/textures/earth/earth_specular_2048.jpg', 'specular');
+    const dayTexture = loadTexture('/textures/earth/earth_day_2048.jpg');
+    const nightTexture = loadTexture('/textures/earth/earth_lights_2048.png');
+    const cloudsTexture = loadTexture('/textures/earth/earth_clouds_2048.png');
+    const specularTexture = loadTexture('/textures/earth/earth_specular_2048.jpg');
 
     const earthRadius = 1.0;
     const sunWorldDir = new THREE.Vector3(3.0, 1.2, 2.5).normalize();
@@ -379,7 +333,27 @@ export function WeatherGlobe() {
       window.removeEventListener('touchmove', onTouchMove);
       window.removeEventListener('touchend', onMouseUp);
       canvasDom.removeEventListener('wheel', onWheel);
+
+      dayTexture?.dispose();
+      nightTexture?.dispose();
+      cloudsTexture?.dispose();
+      specularTexture?.dispose();
+
+      earthGeo?.dispose();
+      earthMat?.dispose();
+      cloudGeo?.dispose();
+      cloudMat?.dispose();
+      glowGeo?.dispose();
+      glowMat?.dispose();
+      pinGeo?.dispose();
+      pinMat?.dispose();
+      ringGeo?.dispose();
+      ringMat?.dispose();
+
       renderer.dispose();
+      if (container && renderer.domElement && renderer.domElement.parentNode === container) {
+        container.removeChild(renderer.domElement);
+      }
     };
   }, [location, favorites, autoRotate]);
 
@@ -448,10 +422,20 @@ export function WeatherGlobe() {
 
       {/* 3D WebGL Canvas Container */}
       <div className="relative w-full h-80 sm:h-[420px] rounded-2xl overflow-hidden bg-gradient-to-b from-[#030712] to-[#080E1A] border border-white/10 shadow-inner flex items-center justify-center">
-        <div
-          ref={containerRef}
-          className="w-full h-full cursor-grab active:cursor-grabbing"
-        />
+        {textureError ? (
+          <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-slate-400">
+            <Globe className="w-10 h-10 text-slate-600 mb-2" />
+            <div className="text-sm font-semibold text-white">Earth Visualization Unavailable</div>
+            <div className="text-xs text-slate-400 mt-1 max-w-xs">
+              Planetary telemetry textures could not be loaded.
+            </div>
+          </div>
+        ) : (
+          <div
+            ref={containerRef}
+            className="w-full h-full cursor-grab active:cursor-grabbing"
+          />
+        )}
 
         {/* Selected City Pin Marker Card */}
         <div className="absolute top-4 left-4 glass-panel rounded-xl px-3 py-2 text-xs border border-white/10 backdrop-blur-md shadow-xl flex items-center gap-2 pointer-events-none">

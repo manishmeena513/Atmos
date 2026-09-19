@@ -111,7 +111,7 @@ export function App() {
             <WindMap />
           </SectionWrapper>
 
-          {/* 6. Live Doppler Precipitation Radar */}
+          {/* 6. Precipitation Radar */}
           <SectionWrapper id="radar-section">
             <RadarSection />
           </SectionWrapper>

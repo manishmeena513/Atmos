@@ -98,17 +98,8 @@ export async function fetchAirQuality(lat, lon) {
     return data;
   } catch (err) {
     clearTimeout(timeoutId);
-    // Return sensible fallback estimated from clean atmosphere
-    return {
-      current: {
-        european_aqi: 22,
-        us_aqi: 25,
-        pm10: 12.4,
-        pm2_5: 7.8,
-        ozone: 42.1,
-        nitrogen_dioxide: 8.5,
-      },
-    };
+    console.warn('Open-Meteo Air Quality telemetry unavailable:', err.message);
+    return null;
   }
 }
 
@@ -144,27 +135,35 @@ export async function searchGeocode(query, count = 8) {
 }
 
 export async function reverseGeocode(lat, lon) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3500);
+
   try {
     const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
     const res = await fetch(url, {
+      signal: controller.signal,
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'AtmosWeatherApp/1.0',
+        'User-Agent': 'AtmosWeatherApp/1.0.1',
       },
     });
+    clearTimeout(timeoutId);
     if (!res.ok) throw new Error('Reverse geocode failed');
     const data = await res.json();
+    const addr = data?.address || {};
     const city =
-      data.address.city ||
-      data.address.town ||
-      data.address.village ||
-      data.address.municipality ||
-      data.address.county ||
-      'Current Location';
-    const country = data.address.country || '';
+      addr.city ||
+      addr.town ||
+      addr.village ||
+      addr.municipality ||
+      addr.county ||
+      addr.state ||
+      `${Number(lat).toFixed(2)}°, ${Number(lon).toFixed(2)}°`;
+    const country = addr.country || '';
     return { name: city, country, lat, lon };
   } catch (err) {
-    return { name: 'Current Location', country: '', lat, lon };
+    clearTimeout(timeoutId);
+    return { name: `${Number(lat).toFixed(2)}°, ${Number(lon).toFixed(2)}°`, country: '', lat, lon };
   }
 }
 

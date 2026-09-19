@@ -108,27 +108,3 @@ input[type="range"]::-moz-range-thumb {
   box-shadow: 0 0 12px rgba(56, 189, 248, 0.7);
   cursor: ew-resize;
 }
-
-/* Leaflet dark theme override */
-.leaflet-container {
-  background: #090e18 !important;
-  font-family: inherit;
-  border-radius: 0.75rem;
-}
-
-.leaflet-tile {
-  filter: brightness(0.7) invert(1) contrast(1.2) hue-rotate(180deg) saturate(0.3);
-}
-
-.leaflet-control-zoom a {
-  background: rgba(15, 21, 33, 0.85) !important;
-  color: #fff !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  backdrop-filter: blur(8px);
-}
-
-.leaflet-control-attribution {
-  background: rgba(8, 11, 16, 0.75) !important;
-  color: rgba(255, 255, 255, 0.5) !important;
-  font-size: 10px !important;
-}

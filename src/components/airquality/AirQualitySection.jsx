@@ -46,24 +46,55 @@ function getAqiCategory(aqi) {
 export function AirQualitySection() {
   const airQuality = useWeatherStore((s) => s.airQuality);
 
-  if (!airQuality?.current) {
+  const curr = airQuality?.current;
+  const aqi = curr?.european_aqi ?? curr?.us_aqi ?? null;
+
+  if (!curr || aqi === null) {
     return (
-      <div className="glass-panel rounded-3xl p-6 flex items-center justify-center text-slate-400 text-sm">
-        <Info className="w-4 h-4 mr-2" />
-        <span>Air quality data currently calibrating...</span>
+      <div className="glass-panel rounded-3xl p-5 sm:p-7 flex flex-col justify-between h-full min-h-[340px]">
+        <div>
+          {/* Header */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400">
+                <Activity className="w-4 h-4" />
+              </div>
+              <h3 className="text-base sm:text-lg font-semibold text-white">
+                Atmospheric Air Quality
+              </h3>
+            </div>
+            <span className="text-[11px] text-slate-400 font-mono">
+              EAQI Scale
+            </span>
+          </div>
+
+          {/* Elegant Unavailable State */}
+          <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col items-center justify-center text-center my-6">
+            <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-slate-400 mb-3">
+              <Info className="w-6 h-6" />
+            </div>
+            <h4 className="text-base font-semibold text-white">Air Quality Data Unavailable</h4>
+            <p className="text-xs text-slate-400 max-w-sm mt-1.5 leading-relaxed">
+              Real-time atmospheric air quality telemetry is currently unavailable from Open-Meteo monitoring stations for this location.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 pt-3 border-t border-white/5 text-[11px] text-slate-500 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <span>Source: Open-Meteo Air Quality Model</span>
+          <span>Status: Telemetry Unavailable</span>
+        </div>
       </div>
     );
   }
 
-  const curr = airQuality.current;
-  const aqi = curr.european_aqi ?? curr.us_aqi ?? 25;
   const aqiInfo = getAqiCategory(aqi);
 
   const pollutants = [
-    { name: 'PM2.5', value: curr.pm2_5 ? `${curr.pm2_5.toFixed(1)} µg/m³` : 'N/A', status: curr.pm2_5 > 25 ? 'Elevated' : 'Clean' },
-    { name: 'PM10', value: curr.pm10 ? `${curr.pm10.toFixed(1)} µg/m³` : 'N/A', status: curr.pm10 > 50 ? 'Elevated' : 'Clean' },
-    { name: 'Ozone (O₃)', value: curr.ozone ? `${curr.ozone.toFixed(1)} µg/m³` : 'N/A', status: 'Normal' },
-    { name: 'Nitrogen (NO₂)', value: curr.nitrogen_dioxide ? `${curr.nitrogen_dioxide.toFixed(1)} µg/m³` : 'N/A', status: 'Low' },
+    { name: 'PM2.5', value: curr.pm2_5 != null ? `${curr.pm2_5.toFixed(1)} µg/m³` : 'N/A', status: curr.pm2_5 != null ? (curr.pm2_5 > 25 ? 'Elevated' : 'Clean') : 'N/A' },
+    { name: 'PM10', value: curr.pm10 != null ? `${curr.pm10.toFixed(1)} µg/m³` : 'N/A', status: curr.pm10 != null ? (curr.pm10 > 50 ? 'Elevated' : 'Clean') : 'N/A' },
+    { name: 'Ozone (O₃)', value: curr.ozone != null ? `${curr.ozone.toFixed(1)} µg/m³` : 'N/A', status: curr.ozone != null ? 'Normal' : 'N/A' },
+    { name: 'Nitrogen (NO₂)', value: curr.nitrogen_dioxide != null ? `${curr.nitrogen_dioxide.toFixed(1)} µg/m³` : 'N/A', status: curr.nitrogen_dioxide != null ? 'Low' : 'N/A' },
   ];
 
   return (

@@ -78,7 +78,6 @@ export default defineConfig({
           vendor: ['react', 'react-dom', 'zustand'],
           motion: ['framer-motion'],
           charts: ['recharts'],
-          leaflet: ['leaflet', 'react-leaflet'],
           mapbox: ['mapbox-gl'],
           three: ['three'],
         },

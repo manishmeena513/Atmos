@@ -262,7 +262,7 @@ export function RadarSection() {
               Precipitation Radar
             </h3>
             <p className="text-xs text-slate-400">
-              Interactive geographic Doppler station for {location.name}
+              Weather radar observations for {location.name}
             </p>
           </div>
         </div>
@@ -275,9 +275,9 @@ export function RadarSection() {
               <span>Loading radar…</span>
             </div>
           ) : radarData?.frames?.length ? (
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span>Live Precipitation Radar</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-300 text-xs font-medium">
+              <span className="w-2 h-2 rounded-full bg-sky-400" />
+              <span>Precipitation Radar</span>
               <span className="text-slate-400 text-[11px]">· Radar: RainViewer</span>
             </div>
           ) : (
