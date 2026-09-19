@@ -225,7 +225,7 @@ export function CityComparison() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5 text-slate-400">
                       <Wind className="w-3.5 h-3.5 text-sky-400" />
-                      <span>Wind Flow</span>
+                      <span>Wind Speed</span>
                     </div>
                     <span className="font-semibold text-white">
                       {wind} {units.wind}

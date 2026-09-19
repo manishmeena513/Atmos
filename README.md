@@ -9,7 +9,7 @@
 
 > **Live Production Deployment**: [https://atmos-gules-two.vercel.app/](https://atmos-gules-two.vercel.app/)
 
-**Atmos** is a premium, high-fidelity living atmospheric weather application engineered with React, Three.js, Mapbox GL JS, and Framer Motion. Powered by Open-Meteo and RainViewer APIs, Atmos bridges real-time meteorological data with real-time digital twin graphics — delivering responsive weather animations, interactive radar maps, and planetary visualizations without compromise.
+**Atmos** is a premium, high-fidelity living atmospheric weather application engineered with React, Three.js, Mapbox GL JS, and Framer Motion. Powered by Open-Meteo APIs, Atmos bridges real-time meteorological data with real-time digital twin graphics — delivering responsive weather animations, interactive geographic maps, and planetary visualizations without compromise.
 
 ---
 
@@ -20,19 +20,15 @@
 - **Sun & Moon Position Simulation**: Celestial trajectories calculated accurately based on local sunrise/sunset timings and geographic latitude.
 - **Glassmorphic UI**: Ultra-thin glass panels with dynamic backdrop blur, subtle borders, and depth layering optimized for high-refresh desktop and mobile viewports.
 
-### 🛰️ Interactive Precipitation Radar
+### 🗺️ Interactive Location Map
 - **High-Precision Mapbox Base**: Cartographic vector dark style base map powered by Mapbox GL JS with smooth pan, zoom, and hardware-accelerated rendering.
-- **RainViewer Weather Raster Integration**: Real-time precipitation radar tile overlay with GPU linear resampling, clamped to RainViewer's supported radar zoom hierarchy (`maxzoom: 7`) to eliminate tile mismatch errors.
-- **Playback & Time Machine**: Interactive timeline scrubbing across past radar scans and predictive precipitation frames with pause/play controls.
+- **Location Pinning**: Pulsing target indicator dynamically pinned to active location coordinates with instant recenter and coordinate diagnostics.
+- **Cooperative Controls**: Smooth touch and scroll gesture isolation ensuring comfortable map inspection on all devices.
 
 ### 🌍 3D Digital Twin Earth
 - **WebGL Planetary System**: Rendered with Three.js featuring dual-texture day/night terminators, dynamic cloud layers, atmospheric Rayleigh glow shader, and specular ocean reflections.
 - **Geographic Pinning**: Real-time lat/lon coordinate plotting with radiating pulse waves indicating current observation locations.
 - **Graceful Fault Tolerance**: Automatic WebGL fallback states with full GPU memory disposal on unmount to prevent resource leaks.
-
-### 💨 Animated Wind Field
-- **Vector Particle Flow**: Dynamic canvas particles simulating atmospheric streamlines where velocity, density, and bearing correspond to live wind speed and wind direction.
-- **Cardinal Diagnostics**: Real-time readout of wind speed, peak gusts, and cardinal compass bearings.
 
 ### 📊 Comprehensive Meteorological Telemetry
 - **Hourly Scrubber & Timeline**: Scroll-snapping 24-hour strip displaying temperature, apparent feels-like curves, weather glyphs, and precipitation probability.
@@ -65,22 +61,21 @@
     │  (Zustand + Framer)      │                                  │    API Serverless        │
     └────────────┬─────────────┘                                  └────────────┬─────────────┘
                  │                                                             │
-      ┌──────────┴──────────┐                                       ┌──────────┴──────────┐
-      ▼                     ▼                                       ▼                     ▼
-┌─────────────┐       ┌─────────────┐                         ┌─────────────┐       ┌─────────────┐
-│ Three.js    │       │ Mapbox GL   │                         │ Open-Meteo  │       │ RainViewer  │
-│ WebGL Globe │       │ Canvas Base │                         │ APIs        │       │ Tile Server │
-└─────────────┘       └─────────────┘                         └─────────────┘       └─────────────┘
+      ┌──────────┴──────────┐                                                  │
+      ▼                     ▼                                                  ▼
+┌─────────────┐       ┌─────────────┐                                    ┌─────────────┐
+│ Three.js    │       │ Mapbox GL   │                                    │ Open-Meteo  │
+│ WebGL Globe │       │ Canvas Base │                                    │ APIs        │
+└─────────────┘       └─────────────┘                                    └─────────────┘
 ```
 
 - **Frontend Core**: React 18, Vite 6, Zustand (atomic state store), Framer Motion
 - **Styling**: Tailwind CSS, Lucide Icons, Custom CSS Glassmorphism
-- **Visual Computing**: Three.js (WebGL Earth), HTML5 2D Canvas (Rain/Wind engines), Mapbox GL JS (Vector Map)
+- **Visual Computing**: Three.js (WebGL Earth), HTML5 2D Canvas (Rain/Snow engines), Mapbox GL JS (Vector Map)
 - **Data & APIs**:
   - **Open-Meteo Forecast API**: High-resolution hourly and daily weather telemetry (No API key required)
   - **Open-Meteo Air Quality API**: Atmospheric chemistry and particulate data
   - **Open-Meteo Geocoding API**: Global city name resolution
-  - **RainViewer API**: Real-time precipitation radar raster tiles
   - **Nominatim / OpenStreetMap**: Safe reverse-geocoding fallback
 
 ---
@@ -107,10 +102,9 @@ Atmos/
 │   │   ├── globe/           # Three.js 3D Earth digital twin
 │   │   ├── hero/            # Hero temperature, sun/moon position, condition
 │   │   ├── layout/          # Top navigation, search modal, settings sheet
+│   │   ├── map/             # Mapbox interactive location map
 │   │   ├── metrics/         # UV, humidity, pressure, visibility widgets
-│   │   ├── radar/           # Mapbox + RainViewer interactive radar station
-│   │   ├── weather/         # Particle background canvas (Rain, Snow, Stars)
-│   │   └── wind/            # Animated wind vector canvas & compass
+│   │   └── weather/         # Particle background canvas (Rain, Snow, Stars)
 │   ├── store/
 │   │   └── weatherStore.js  # Zustand state management (units, search, caches)
 │   ├── styles/
@@ -163,8 +157,6 @@ Generates optimized, tree-shaken static bundles in `dist/` with split vendor chu
 ## 🔒 Reliability & Quality Engineering (v1.0.1)
 
 - **Strict Zero-Fabrication Metric Guard**: Fake static fallback values (e.g. synthetic AQI ratings) have been eliminated. Missing metrics display informative, non-intrusive unavailable states.
-- **Accurate Station Nomenclature**: Radar stations display precise provider attribution ("Radar: RainViewer") rather than ambiguous labeling.
-- **Tile Zoom Boundary Protection**: Mapbox raster layer sources limit satellite/radar tile queries strictly to RainViewer's supported zoom hierarchy (`maxzoom: 7`), preventing `404` or `Zoom Level Not Supported` visual artifacts while enabling smooth vector map zooming up to zoom level 18.
 - **Cooperative Viewport Interaction**: Three.js Earth and canvas modules feature cooperative scroll zooming (`Ctrl + Scroll` / `Meta + Scroll`) and vertical pan pass-through (`touch-action: pan-y`) to prevent accidental touch lock on mobile devices.
 - **Hardware Resource Teardown**: Comprehensive WebGL texture, geometry, and renderer disposal on unmount guarantees zero GPU memory accumulation during prolonged browsing sessions.
 
@@ -173,7 +165,6 @@ Generates optimized, tree-shaken static bundles in `dist/` with split vendor chu
 ## 🌐 Data Providers & Credits
 
 - Weather telemetry, hourly/daily forecasts, and air quality: [Open-Meteo](https://open-meteo.com/)
-- Live precipitation radar imagery: [RainViewer](https://www.rainviewer.com/)
 - Cartographic vector base maps: [Mapbox](https://www.mapbox.com/)
 - Digital twin planetary textures: [NASA Earth Observatory](https://visibleearth.nasa.gov/)
 - Geocoding and reverse location services: [Open-Meteo Geocoding](https://open-meteo.com/en/docs/geocoding-api) & [OpenStreetMap Nominatim](https://nominatim.openstreetmap.org/)

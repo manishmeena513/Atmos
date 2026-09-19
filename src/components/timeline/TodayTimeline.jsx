@@ -122,7 +122,7 @@ export function TodayTimeline() {
           </div>
           <div>
             <div className="text-[11px] font-medium text-slate-400 uppercase tracking-wider">
-              Wind Flow
+              Wind Speed
             </div>
             <div className="text-sm sm:text-base font-semibold text-slate-200 flex items-center gap-1 mt-0.5">
               <Wind className="w-3.5 h-3.5" />

@@ -12,8 +12,7 @@ import { SunMoonArc } from './components/sunmoon/SunMoonArc';
 import { AirQualitySection } from './components/airquality/AirQualitySection';
 import { WeatherInsights } from './components/insights/WeatherInsights';
 import { ActivityMode } from './components/activity/ActivityMode';
-import { RadarSection } from './components/radar/RadarSection';
-import { WindMap } from './components/wind/WindMap';
+import { LocationMap } from './components/map/LocationMap';
 import { CityComparison } from './components/compare/CityComparison';
 import { FavoritesCities } from './components/favorites/FavoritesCities';
 import { GlassOverlay } from './components/glass/GlassOverlay';
@@ -106,17 +105,12 @@ export function App() {
             </div>
           </SectionWrapper>
 
-          {/* 5. Wind Flow Field & Direction Telemetry */}
-          <SectionWrapper id="wind-section">
-            <WindMap />
+          {/* 5. Geographic Location Map */}
+          <SectionWrapper id="map-section">
+            <LocationMap />
           </SectionWrapper>
 
-          {/* 6. Precipitation Radar */}
-          <SectionWrapper id="radar-section">
-            <RadarSection />
-          </SectionWrapper>
-
-          {/* 7. Planet 3D Weather Globe (Lazy Loaded) */}
+          {/* 6. Planet 3D Weather Globe (Lazy Loaded) */}
           <SectionWrapper id="globe-section">
             <Suspense
               fallback={
@@ -130,12 +124,12 @@ export function App() {
             </Suspense>
           </SectionWrapper>
 
-          {/* 8. City Comparison Matrix */}
+          {/* 7. City Comparison Matrix */}
           <SectionWrapper id="compare-section">
             <CityComparison />
           </SectionWrapper>
 
-          {/* 9. Air Quality & Sun/Moon Cycle */}
+          {/* 8. Air Quality & Sun/Moon Cycle */}
           <SectionWrapper id="airquality-section">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               <div className="lg:col-span-7">
@@ -147,12 +141,12 @@ export function App() {
             </div>
           </SectionWrapper>
 
-          {/* 10. Actionable Weather Insights */}
+          {/* 9. Actionable Weather Insights */}
           <SectionWrapper id="insights-section">
             <WeatherInsights />
           </SectionWrapper>
 
-          {/* 11. Activity Mode (Planning) */}
+          {/* 10. Activity Mode (Planning) */}
           <SectionWrapper id="activity-section">
             <ActivityMode />
           </SectionWrapper>
@@ -165,7 +159,7 @@ export function App() {
               <span>Living Weather Experience</span>
             </div>
             <p>
-              Telemetry delivered via Open-Meteo High-Resolution Atmospheric Models and RainViewer Radar Network (Keyless).
+              Telemetry delivered via Open-Meteo High-Resolution Atmospheric Models.
             </p>
             <div className="flex items-center justify-center gap-4 text-slate-500 pt-2">
               <button

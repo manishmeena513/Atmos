@@ -115,7 +115,7 @@ export function WeatherInfo({ current, daily, location, timezone }) {
         <div className="sm:px-4 flex items-center gap-2">
           <Wind className="w-4 h-4 text-sky-400 shrink-0" />
           <div>
-            <span className="text-slate-400 text-[11px] block leading-none">Wind Flow</span>
+            <span className="text-slate-400 text-[11px] block leading-none">Wind Speed</span>
             <span className="font-semibold text-white mt-0.5 block leading-tight">
               {windSpeedVal} {units.wind}
             </span>

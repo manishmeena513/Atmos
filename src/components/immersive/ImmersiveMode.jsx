@@ -189,7 +189,7 @@ export function ImmersiveMode({ isOpen, onClose }) {
                 <span className="font-semibold text-white">{feelsLike}°{units.temp}</span>
               </div>
               <div className="px-6">
-                <span className="text-white/45 text-[11px] block uppercase tracking-wider">Wind Flow</span>
+                <span className="text-white/45 text-[11px] block uppercase tracking-wider">Wind Speed</span>
                 <span className="font-semibold text-white">{windSpeedVal} {units.wind}</span>
               </div>
               <div className="pl-6">

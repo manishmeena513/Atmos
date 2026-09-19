@@ -26,7 +26,7 @@ export function LoadingAtmosphere({ city = 'Atmosphere' }) {
             Reading Atmosphere
           </h2>
           <p className="text-sm text-slate-400 mt-1">
-            Calibrating sky metrics, cloud depth, and wind telemetry for {city}...
+            Calibrating sky metrics, cloud depth, and atmospheric telemetry for {city}...
           </p>
         </div>
 
