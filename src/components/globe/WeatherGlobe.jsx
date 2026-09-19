@@ -18,10 +18,23 @@ export function WeatherGlobe() {
   const location = useWeatherStore((s) => s.location);
   const favorites = useWeatherStore((s) => s.favorites);
 
-  const [autoRotate, setAutoRotate] = useState(true);
+  const [autoRotate, setAutoRotate] = useState(false);
   const [textureError, setTextureError] = useState(false);
-  const cameraRef = useRef(null);
 
+  const cameraRef = useRef(null);
+  const sceneRef = useRef(null);
+  const rendererRef = useRef(null);
+  const earthMeshRef = useRef(null);
+  const cloudMeshRef = useRef(null);
+  const activePinRef = useRef(null);
+  const ringMeshRef = useRef(null);
+  const favPinsGroupRef = useRef(null);
+  const isVisibleRef = useRef(true);
+
+  // Target rotation for smooth camera/globe transition
+  const targetRotationRef = useRef({ y: 0, x: 0, active: false });
+
+  // 1. Initialize Scene & WebGL once on mount
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -31,6 +44,8 @@ export function WeatherGlobe() {
 
     // 1. Scene & Camera Setup
     const scene = new THREE.Scene();
+    sceneRef.current = scene;
+
     const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 1000);
     camera.position.z = 2.75;
     cameraRef.current = camera;
@@ -43,12 +58,13 @@ export function WeatherGlobe() {
     });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    rendererRef.current = renderer;
+
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
 
-    // 3. Load NASA Blue Marble High-Res Local Textures
+    // 3. Texture Loader
     const textureLoader = new THREE.TextureLoader();
-
     const loadTexture = (path) =>
       textureLoader.load(
         path,
@@ -72,7 +88,7 @@ export function WeatherGlobe() {
     const earthRadius = 1.0;
     const sunWorldDir = new THREE.Vector3(3.0, 1.2, 2.5).normalize();
 
-    // 4. Photorealistic Earth Surface Shader with Day/Night Terminator Blending
+    // 4. Photorealistic Earth Surface Shader with Day/Night Terminator
     const earthGeo = new THREE.SphereGeometry(earthRadius, 64, 64);
     const earthMat = new THREE.ShaderMaterial({
       uniforms: {
@@ -108,31 +124,23 @@ export function WeatherGlobe() {
           vec3 norm = normalize(vWorldNormal);
           vec3 sunDir = normalize(uSunDirection);
 
-          // Sunlight dot product determines Day/Night boundary
           float sunDot = dot(norm, sunDir);
-
           vec4 dayColor = texture2D(uDayMap, vUv);
           vec4 nightColor = texture2D(uNightMap, vUv);
           float specular = texture2D(uSpecularMap, vUv).r;
 
-          // Smooth day/night blend across the terminator
           float dayFactor = smoothstep(-0.15, 0.22, sunDot);
           float nightFactor = smoothstep(0.18, -0.22, sunDot);
 
-          // Ocean specular reflection (sun glint)
           vec3 viewDir = normalize(cameraPosition - vWorldPosition);
           vec3 reflectDir = reflect(-sunDir, norm);
           float specIntensity = pow(max(dot(viewDir, reflectDir), 0.0), 30.0) * specular;
           vec3 oceanGlint = vec3(0.5, 0.8, 1.0) * specIntensity * 1.5 * dayFactor;
 
-          // Diffuse daylight illumination
           float diffuse = max(sunDot, 0.0) * 0.9 + 0.12;
           vec3 litDay = dayColor.rgb * diffuse;
-
-          // Warm city lights illumination on dark hemisphere
           vec3 glowingNight = nightColor.rgb * vec3(1.15, 1.0, 0.8) * nightFactor * 1.6;
 
-          // Final combined color
           vec3 color = litDay * dayFactor + glowingNight + oceanGlint;
           gl_FragColor = vec4(color, 1.0);
         }
@@ -140,9 +148,10 @@ export function WeatherGlobe() {
     });
 
     const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+    earthMeshRef.current = earthMesh;
     scene.add(earthMesh);
 
-    // 5. Independent Rotating Cloud Layer Sphere
+    // 5. Cloud Layer Sphere
     const cloudGeo = new THREE.SphereGeometry(earthRadius + 0.018, 64, 64);
     const cloudMat = new THREE.MeshStandardMaterial({
       map: cloudsTexture,
@@ -152,9 +161,10 @@ export function WeatherGlobe() {
       depthWrite: false,
     });
     const cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
+    cloudMeshRef.current = cloudMesh;
     scene.add(cloudMesh);
 
-    // 6. Rayleigh Atmosphere Halo Rim Glow
+    // 6. Atmosphere Halo
     const glowGeo = new THREE.SphereGeometry(earthRadius + 0.065, 48, 48);
     const glowMat = new THREE.ShaderMaterial({
       vertexShader: `
@@ -178,19 +188,17 @@ export function WeatherGlobe() {
     const glowMesh = new THREE.Mesh(glowGeo, glowMat);
     scene.add(glowMesh);
 
-    // 7. Coordinate Marker Pins attached to Earth
+    // 7. Pin Group attached to Earth
     const pinGroup = new THREE.Group();
     earthMesh.add(pinGroup);
 
-    // Active City Pin
-    const activePos = latLonToVector3(location.lat, location.lon, earthRadius + 0.022);
+    // Active Pin & Ring
     const pinGeo = new THREE.SphereGeometry(0.024, 16, 16);
     const pinMat = new THREE.MeshBasicMaterial({ color: '#38BDF8' });
     const pinMesh = new THREE.Mesh(pinGeo, pinMat);
-    pinMesh.position.copy(activePos);
+    activePinRef.current = pinMesh;
     pinGroup.add(pinMesh);
 
-    // Pulsing Beacon Ring
     const ringGeo = new THREE.RingGeometry(0.035, 0.054, 32);
     const ringMat = new THREE.MeshBasicMaterial({
       color: '#60A5FA',
@@ -199,33 +207,22 @@ export function WeatherGlobe() {
       opacity: 0.85,
     });
     const ringMesh = new THREE.Mesh(ringGeo, ringMat);
-    ringMesh.position.copy(activePos);
-    ringMesh.lookAt(activePos.clone().multiplyScalar(2));
+    ringMeshRef.current = ringMesh;
     pinGroup.add(ringMesh);
 
-    // Favorite City Pins (Warm amber)
-    favorites.forEach((fav) => {
-      const fPos = latLonToVector3(fav.lat, fav.lon, earthRadius + 0.022);
-      const fGeo = new THREE.SphereGeometry(0.016, 12, 12);
-      const fMat = new THREE.MeshBasicMaterial({ color: '#F59E0B' });
-      const fMesh = new THREE.Mesh(fGeo, fMat);
-      fMesh.position.copy(fPos);
-      pinGroup.add(fMesh);
-    });
+    // Favorites Pin Group
+    const favPinsGroup = new THREE.Group();
+    favPinsGroupRef.current = favPinsGroup;
+    pinGroup.add(favPinsGroup);
 
-    // 8. Initial Orientation targeting selected location
-    const targetPhi = (90 - location.lat) * (Math.PI / 180);
-    const targetTheta = (location.lon + 180) * (Math.PI / 180);
-    earthMesh.rotation.y = -targetTheta - Math.PI / 2;
-    earthMesh.rotation.x = targetPhi - Math.PI / 2;
-
-    // 9. Interactive Drag & Touch Orbit Controls
+    // 8. Interaction handling
     let isDragging = false;
     let prevMouse = { x: 0, y: 0 };
     let dragVelocity = { x: 0, y: 0 };
 
     const onMouseDown = (e) => {
       isDragging = true;
+      targetRotationRef.current.active = false;
       prevMouse = { x: e.clientX, y: e.clientY };
       dragVelocity = { x: 0, y: 0 };
     };
@@ -247,6 +244,7 @@ export function WeatherGlobe() {
     const onTouchStart = (e) => {
       if (e.touches.length === 1) {
         isDragging = true;
+        targetRotationRef.current.active = false;
         prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
         dragVelocity = { x: 0, y: 0 };
       }
@@ -263,8 +261,6 @@ export function WeatherGlobe() {
     };
 
     const onWheel = (e) => {
-      // Cooperative gesture: Only zoom camera if Ctrl or Cmd key is pressed
-      // Normal wheel scrolling passes straight through to scroll the page!
       if (e.ctrlKey || e.metaKey) {
         e.preventDefault();
         camera.position.z = Math.max(1.8, Math.min(4.2, camera.position.z + e.deltaY * 0.002));
@@ -281,6 +277,17 @@ export function WeatherGlobe() {
     window.addEventListener('touchend', onMouseUp);
     canvasDom.addEventListener('wheel', onWheel, { passive: false });
 
+    // 9. Intersection Observer for battery & GPU throttling
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          isVisibleRef.current = entry.isIntersecting;
+        });
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(container);
+
     // 10. Animation Loop
     let animId;
     let pulseScale = 1;
@@ -289,8 +296,21 @@ export function WeatherGlobe() {
     const animate = () => {
       animId = requestAnimationFrame(animate);
 
-      // Continual smooth planetary motion
-      if (autoRotate && !isDragging) {
+      if (!isVisibleRef.current) return;
+
+      // Smooth transition to target location coordinates
+      if (targetRotationRef.current.active) {
+        const { y: ty, x: tx } = targetRotationRef.current;
+        earthMesh.rotation.y += (ty - earthMesh.rotation.y) * 0.06;
+        earthMesh.rotation.x += (tx - earthMesh.rotation.x) * 0.06;
+
+        if (
+          Math.abs(ty - earthMesh.rotation.y) < 0.001 &&
+          Math.abs(tx - earthMesh.rotation.x) < 0.001
+        ) {
+          targetRotationRef.current.active = false;
+        }
+      } else if (autoRotate && !isDragging) {
         earthMesh.rotation.y += 0.001;
       } else if (!isDragging && (Math.abs(dragVelocity.x) > 0.0001 || Math.abs(dragVelocity.y) > 0.0001)) {
         earthMesh.rotation.y += dragVelocity.x;
@@ -299,14 +319,15 @@ export function WeatherGlobe() {
         dragVelocity.y *= 0.92;
       }
 
-      // Independent weather cloud rotation
-      cloudMesh.rotation.y += 0.0013;
+      cloudMesh.rotation.y += 0.0012;
 
       // Pulse active beacon ring
       pulseScale += pulseDir;
       if (pulseScale > 1.35) pulseDir = -0.01;
       if (pulseScale < 0.95) pulseDir = 0.01;
-      ringMesh.scale.set(pulseScale, pulseScale, 1);
+      if (ringMeshRef.current) {
+        ringMeshRef.current.scale.set(pulseScale, pulseScale, 1);
+      }
 
       renderer.render(scene, camera);
     };
@@ -325,6 +346,7 @@ export function WeatherGlobe() {
 
     return () => {
       cancelAnimationFrame(animId);
+      observer.disconnect();
       window.removeEventListener('resize', handleResize);
       canvasDom.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('mousemove', onMouseMove);
@@ -355,7 +377,51 @@ export function WeatherGlobe() {
         container.removeChild(renderer.domElement);
       }
     };
-  }, [location, favorites, autoRotate]);
+  }, [autoRotate]);
+
+  // 2. Smoothly rotate to new active city coordinates when location changes
+  useEffect(() => {
+    if (!earthMeshRef.current || !activePinRef.current || !ringMeshRef.current) return;
+
+    const activePos = latLonToVector3(location.lat, location.lon, 1.022);
+    activePinRef.current.position.copy(activePos);
+    ringMeshRef.current.position.copy(activePos);
+    ringMeshRef.current.lookAt(activePos.clone().multiplyScalar(2));
+
+    const targetPhi = (90 - location.lat) * (Math.PI / 180);
+    const targetTheta = (location.lon + 180) * (Math.PI / 180);
+    const targetY = -targetTheta - Math.PI / 2;
+    const targetX = targetPhi - Math.PI / 2;
+
+    // Set target rotation for smooth animation transition
+    targetRotationRef.current = { y: targetY, x: targetX, active: true };
+  }, [location.lat, location.lon]);
+
+  // 3. Update Favorite Pins without re-initializing WebGL
+  useEffect(() => {
+    const group = favPinsGroupRef.current;
+    if (!group) return;
+
+    // Clear old favorite meshes
+    while (group.children.length > 0) {
+      const child = group.children[0];
+      if (child.geometry) child.geometry.dispose();
+      if (child.material) child.material.dispose();
+      group.remove(child);
+    }
+
+    const fGeo = new THREE.SphereGeometry(0.016, 12, 12);
+    const fMat = new THREE.MeshBasicMaterial({ color: '#F59E0B' });
+
+    favorites.forEach((fav) => {
+      // Don't duplicate active location pin
+      if (Math.abs(fav.lat - location.lat) < 0.1 && Math.abs(fav.lon - location.lon) < 0.1) return;
+      const fPos = latLonToVector3(fav.lat, fav.lon, 1.022);
+      const fMesh = new THREE.Mesh(fGeo, fMat);
+      fMesh.position.copy(fPos);
+      group.add(fMesh);
+    });
+  }, [favorites, location.lat, location.lon]);
 
   const zoomIn = () => {
     if (cameraRef.current) {
@@ -367,6 +433,16 @@ export function WeatherGlobe() {
     if (cameraRef.current) {
       cameraRef.current.position.z = Math.min(4.2, cameraRef.current.position.z + 0.3);
     }
+  };
+
+  const recenterCity = () => {
+    const targetPhi = (90 - location.lat) * (Math.PI / 180);
+    const targetTheta = (location.lon + 180) * (Math.PI / 180);
+    targetRotationRef.current = {
+      y: -targetTheta - Math.PI / 2,
+      x: targetPhi - Math.PI / 2,
+      active: true,
+    };
   };
 
   return (
@@ -387,8 +463,17 @@ export function WeatherGlobe() {
           </div>
         </div>
 
-        {/* Controls: Rotate & Zoom */}
+        {/* Controls: Recenter, Rotate & Zoom */}
         <div className="flex items-center gap-2">
+          <button
+            onClick={recenterCity}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border bg-white/[0.04] text-slate-300 border-white/10 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+            title="Recenter camera to active city"
+          >
+            <MapPin className="w-3.5 h-3.5 text-sky-400" />
+            <span>Focus</span>
+          </button>
+
           <button
             onClick={() => setAutoRotate(!autoRotate)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
@@ -404,14 +489,14 @@ export function WeatherGlobe() {
           <div className="flex rounded-full bg-white/[0.04] border border-white/10 p-0.5">
             <button
               onClick={zoomIn}
-              className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+              className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               title="Zoom in"
             >
               <ZoomIn className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={zoomOut}
-              className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+              className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               title="Zoom out"
             >
               <ZoomOut className="w-3.5 h-3.5" />
@@ -450,7 +535,7 @@ export function WeatherGlobe() {
 
         {/* Drag Hint */}
         <div className="absolute bottom-4 right-4 text-[10px] text-slate-400 font-medium glass-pill px-2.5 py-1 rounded-full pointer-events-none">
-          Drag to rotate · Ctrl + scroll or buttons to zoom
+          Drag to orbit · Focus to target city
         </div>
       </div>
     </div>

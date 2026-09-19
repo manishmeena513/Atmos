@@ -6,6 +6,7 @@ import { SectionWrapper } from './components/layout/SectionWrapper';
 import { HeroSection } from './components/hero/HeroSection';
 import { TodayTimeline } from './components/timeline/TodayTimeline';
 import { HourlyForecast } from './components/hourly/HourlyForecast';
+import { WeatherDetails } from './components/metrics/WeatherDetails';
 import { TemperatureChart } from './components/charts/TemperatureChart';
 import { SevenDayForecast } from './components/forecast/SevenDayForecast';
 import { SunMoonArc } from './components/sunmoon/SunMoonArc';
@@ -91,6 +92,11 @@ export function App() {
           {/* 3. Hourly Forecast Horizontal Cards */}
           <SectionWrapper id="hourly-section">
             <HourlyForecast />
+          </SectionWrapper>
+
+          {/* Advanced Atmospheric Telemetry & Rule-Based Explanations */}
+          <SectionWrapper id="details-section">
+            <WeatherDetails />
           </SectionWrapper>
 
           {/* 4. 7-Day Forecast & 24-Hour Temperature Curve */}
@@ -182,6 +188,10 @@ export function App() {
               >
                 Enter Weather
               </button>
+            </div>
+            <div className="pt-6 border-t border-white/5 space-y-1 text-slate-500 text-[11px]">
+              <div>&copy; {new Date().getFullYear()} Atmos. All rights reserved.</div>
+              <div className="text-slate-400 font-medium">Developed by Manish Meena.</div>
             </div>
           </footer>
         </main>

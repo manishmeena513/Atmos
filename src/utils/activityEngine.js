@@ -8,9 +8,10 @@ export const ACTIVITIES = [
   { id: 'running', name: 'Running', icon: 'Flame' },
   { id: 'cycling', name: 'Cycling', icon: 'Bike' },
   { id: 'photography', name: 'Photography', icon: 'Camera' },
+  { id: 'study', name: 'Outdoor Study & Work', icon: 'BookOpen' },
+  { id: 'travel', name: 'Travel & Sightseeing', icon: 'Plane' },
   { id: 'sports', name: 'Outdoor Sports', icon: 'Trophy' },
   { id: 'driving', name: 'Driving', icon: 'Car' },
-  { id: 'travel', name: 'Travel & Sightseeing', icon: 'Plane' },
 ];
 
 export function analyzeActivity(activityId, weatherData) {
@@ -34,6 +35,7 @@ export function analyzeActivity(activityId, weatherData) {
   const winds = hourly.wind_speed_10m || [];
   const uvs = hourly.uv_index || [];
   const visibilities = hourly.visibility || [];
+  const clouds = hourly.cloud_cover || [];
 
   const sunrise = daily?.sunrise?.[0] ? new Date(daily.sunrise[0]) : null;
   const sunset = daily?.sunset?.[0] ? new Date(daily.sunset[0]) : null;
@@ -49,7 +51,7 @@ export function analyzeActivity(activityId, weatherData) {
         : '17:30 – 18:45';
 
       const avgVis = visibilities.slice(0, 12).reduce((a, b) => a + b, 0) / (visibilities.length || 1);
-      const isCloudy = hourly.cloud_cover ? hourly.cloud_cover[currentHour] > 40 : true;
+      const isCloudy = clouds[currentHour] ? clouds[currentHour] > 40 : true;
 
       return {
         suitability: isCloudy ? 'Dramatic Skies' : 'High Clarity',
@@ -58,15 +60,86 @@ export function analyzeActivity(activityId, weatherData) {
         factors: [
           { label: 'Golden Hour (Dawn)', value: goldenMorning, detail: 'Warm diffused sidelight' },
           { label: 'Golden Hour (Dusk)', value: goldenEvening, detail: 'Long shadows & deep hues' },
-          { label: 'Cloud Cover', value: `${hourly.cloud_cover?.[currentHour] || 35}%`, detail: 'Soft natural diffuser' },
+          { label: 'Cloud Cover', value: `${clouds[currentHour] || 35}%`, detail: 'Soft natural diffuser' },
           { label: 'Avg Visibility', value: `${Math.round(avgVis / 1000)} km`, detail: 'Horizon definition' },
         ],
         summary: 'Optimal lighting occurs around golden hours. Atmospheric clouds will enhance sky contrast without direct glare.',
       };
     }
 
+    case 'study': {
+      // Best when wind < 15 km/h, precip < 10%, temp between 18 and 26C
+      const curTemp = temps[currentHour] || 20;
+      const curWind = winds[currentHour] || 10;
+      const curPrecip = precips[currentHour] || 0;
+      const curUv = uvs[currentHour] || 2;
+
+      const isWindy = curWind > 18;
+      const isWet = curPrecip > 20;
+      const isTooHot = curTemp > 28;
+
+      let suitability = 'Optimal Study Air';
+      let score = 94;
+      if (isWet) {
+        suitability = 'Indoor Recommended';
+        score = 45;
+      } else if (isWindy) {
+        suitability = 'Breezy (Drafts)';
+        score = 68;
+      } else if (isTooHot) {
+        suitability = 'Warm in Direct Sun';
+        score = 72;
+      }
+
+      return {
+        suitability,
+        score,
+        bestWindows: ['10:00 – 12:30', '16:00 – 18:30'],
+        factors: [
+          { label: 'Air Flow / Wind', value: `${Math.round(curWind)} km/h`, detail: isWindy ? 'Loose papers may blow' : 'Gentle ambient breeze' },
+          { label: 'Ambient Temperature', value: `${Math.round(curTemp)}°C`, detail: 'Thermal focus comfort' },
+          { label: 'Screen Glare / UV', value: `UV ${Math.round(curUv)}`, detail: curUv > 5 ? 'Shaded spot recommended' : 'Low optical glare' },
+          { label: 'Rain Probability', value: `${curPrecip}%`, detail: curPrecip > 0 ? 'Possible moisture droplets' : 'Dry workspace' },
+        ],
+        summary: isWet
+          ? 'Precipitation risk detected; consider studying in a veranda or indoors with natural light.'
+          : 'Great conditions for an outdoor reading session or laptop workspace. Choose a shaded bench to reduce glare.',
+      };
+    }
+
+    case 'travel': {
+      const curVis = (visibilities[currentHour] || 10000) / 1000;
+      const curRain = precips[currentHour] || 0;
+      const curTemp = temps[currentHour] || 19;
+      const daylightTotal = daily?.daylight_duration?.[0] ? `${(daily.daylight_duration[0] / 3600).toFixed(1)} hrs` : 'Full Day';
+
+      let suitability = 'Prime Sightseeing';
+      let score = 95;
+      if (curRain > 40) {
+        suitability = 'Museum & Indoor Day';
+        score = 60;
+      } else if (curVis < 4) {
+        suitability = 'Softened Panoramas';
+        score = 75;
+      }
+
+      return {
+        suitability,
+        score,
+        bestWindows: ['09:30 – 14:00', '15:30 – 18:30'],
+        factors: [
+          { label: 'Optical Horizon', value: `${curVis.toFixed(1)} km`, detail: curVis >= 10 ? 'Crystal clear landmarks' : 'Mild atmospheric haze' },
+          { label: 'Walking Comfort', value: `${Math.round(curTemp)}°C`, detail: 'Foot transit pacing' },
+          { label: 'Rain Probability', value: `${curRain}%`, detail: curRain > 30 ? 'Pack compact umbrella' : 'Clear streets' },
+          { label: 'Daylight Window', value: daylightTotal, detail: 'Available exploration time' },
+        ],
+        summary: curRain > 40
+          ? 'Scattered showers expected. Combine indoor cultural stops with brief walking tours between cloud breaks.'
+          : 'High visibility and comfortable pedestrian temperatures provide ideal conditions for city walking and sightseeing.',
+      };
+    }
+
     case 'running': {
-      // Best when temp is 10-18C, wind < 20, precip < 20%
       const candidateHours = [];
       for (let i = 0; i < 24; i++) {
         const t = temps[i] ?? 18;
@@ -112,6 +185,23 @@ export function analyzeActivity(activityId, weatherData) {
           { label: 'Visibility', value: `${Math.round((visibilities[currentHour] || 10000) / 1000)} km`, detail: 'Lane awareness' },
         ],
         summary: 'Clear line of sight with moderate winds. Choose early morning routes before crosswinds pick up.',
+      };
+    }
+
+    case 'sports': {
+      const windSpeed = winds[currentHour] || 10;
+      const precipProb = precips[currentHour] || 0;
+      const currentTemp = temps[currentHour] || 18;
+      return {
+        suitability: precipProb > 30 ? 'Damp Field' : windSpeed > 25 ? 'High Ball Drift' : 'Game Ready',
+        score: precipProb < 20 && windSpeed < 20 ? 92 : 70,
+        bestWindows: ['15:00 – 18:00', '09:00 – 11:30'],
+        factors: [
+          { label: 'Field Condition', value: precipProb > 30 ? 'Slippery' : 'Firm Turf', detail: 'Traction on turf' },
+          { label: 'Wind Drift', value: `${Math.round(windSpeed)} km/h`, detail: 'Projectile / ball trajectory' },
+          { label: 'Comfort Level', value: `${Math.round(currentTemp)}°C`, detail: 'Athletic exertion heat' },
+        ],
+        summary: 'Good conditions for outdoor team games and racquet sports. Wind speeds permit accurate ball play.',
       };
     }
 

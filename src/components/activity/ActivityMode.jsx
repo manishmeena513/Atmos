@@ -8,6 +8,7 @@ import {
   Trophy,
   Car,
   Plane,
+  BookOpen,
   Clock,
   Sparkles,
   Compass,
@@ -23,6 +24,7 @@ const ICON_MAP = {
   Trophy,
   Car,
   Plane,
+  BookOpen,
 };
 
 export function ActivityMode() {

@@ -154,10 +154,16 @@ Generates optimized, tree-shaken static bundles in `dist/` with split vendor chu
 
 ---
 
-## 🔒 Reliability & Quality Engineering (v1.0.1)
+## 🔒 Reliability & Quality Engineering (v2.0.0)
 
 - **Strict Zero-Fabrication Metric Guard**: Fake static fallback values (e.g. synthetic AQI ratings) have been eliminated. Missing metrics display informative, non-intrusive unavailable states.
-- **Cooperative Viewport Interaction**: Three.js Earth and canvas modules feature cooperative scroll zooming (`Ctrl + Scroll` / `Meta + Scroll`) and vertical pan pass-through (`touch-action: pan-y`) to prevent accidental touch lock on mobile devices.
+- **Advanced Meteorological Telemetry**: Real-time dew point, UV exposure index, 3-hour barometric pressure trends, and optical visibility distance with deterministic rule-based natural language insights.
+- **Interactive Hourly Inspection Drawer**: Seamless touch-scroll 24-hour forecast with interactive hour inspection panel and instant Reset to Live control.
+- **Enhanced 7-Day Forecast**: Multi-day outlook with expandable accordions detailing precipitation sums (mm), peak wind gusts, UV peak, sunrise, and sunset.
+- **3D Earth Digital Twin**: Smooth camera spherical interpolation to focused city, glowing favorite pins, and `IntersectionObserver` RAF throttling for battery/GPU efficiency.
+- **Live Pinned Locations**: Pinned favorite cities display live temperature badges and condition glyphs with one-tap switching.
+- **Global Comparison Matrix**: Multi-city comparison stage cross-evaluating temperatures, humidity, wind, UV, and genuine air quality telemetry.
+- **Cooperative Viewport Interaction**: Three.js Earth and canvas modules feature cooperative scroll zooming (`Ctrl + Scroll` / `Meta + Scroll`) and vertical pan pass-through (`touch-action: pan-y`) to prevent touch lock on mobile devices.
 - **Hardware Resource Teardown**: Comprehensive WebGL texture, geometry, and renderer disposal on unmount guarantees zero GPU memory accumulation during prolonged browsing sessions.
 
 ---
@@ -168,6 +174,13 @@ Generates optimized, tree-shaken static bundles in `dist/` with split vendor chu
 - Cartographic vector base maps: [Mapbox](https://www.mapbox.com/)
 - Digital twin planetary textures: [NASA Earth Observatory](https://visibleearth.nasa.gov/)
 - Geocoding and reverse location services: [Open-Meteo Geocoding](https://open-meteo.com/en/docs/geocoding-api) & [OpenStreetMap Nominatim](https://nominatim.openstreetmap.org/)
+
+---
+
+## 👨‍💻 Developer & Copyright
+
+**Atmos** is designed and developed by **Manish Meena**.  
+© 2026 Atmos. All rights reserved.
 
 ---
 

@@ -12,7 +12,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useWeatherStore } from '../../store/weatherStore';
-import { fetchWeather } from '../../api/openmeteo';
+import { fetchWeather, fetchAirQuality } from '../../api/openmeteo';
 import { getWmoInfo } from '../../utils/wmoCodeMap';
 
 const PRESET_CITIES = [
@@ -34,7 +34,7 @@ export function CityComparison() {
   const [cityDataMap, setCityDataMap] = useState({});
   const [loading, setLoading] = useState(false);
 
-  // Fetch weather for all cities being compared
+  // Fetch weather and real AQI for all cities being compared
   useEffect(() => {
     const all = [currentCity, ...comparedCities];
     let isMounted = true;
@@ -43,17 +43,24 @@ export function CityComparison() {
     Promise.all(
       all.map(async (c) => {
         try {
-          const w = await fetchWeather(c.lat, c.lon);
-          return { key: `${c.lat}-${c.lon}`, data: w };
+          const [wRes, aqRes] = await Promise.allSettled([
+            fetchWeather(c.lat, c.lon),
+            fetchAirQuality(c.lat, c.lon),
+          ]);
+          return {
+            key: `${c.lat}-${c.lon}`,
+            weather: wRes.status === 'fulfilled' ? wRes.value : null,
+            aqi: aqRes.status === 'fulfilled' && aqRes.value?.current ? aqRes.value.current : null,
+          };
         } catch {
-          return { key: `${c.lat}-${c.lon}`, data: null };
+          return { key: `${c.lat}-${c.lon}`, weather: null, aqi: null };
         }
       })
     ).then((results) => {
       if (!isMounted) return;
       const map = {};
       results.forEach((r) => {
-        if (r.data) map[r.key] = r.data;
+        map[r.key] = { weather: r.weather, aqi: r.aqi };
       });
       setCityDataMap(map);
       setLoading(false);
@@ -120,7 +127,9 @@ export function CityComparison() {
         {citiesToDisplay.map((city, idx) => {
           const isPrimary = idx === 0;
           const key = `${city.lat}-${city.lon}`;
-          const weather = cityDataMap[key];
+          const entry = cityDataMap[key];
+          const weather = entry?.weather;
+          const aqiData = entry?.aqi;
           const curr = weather?.current;
           const wmo = curr ? getWmoInfo(curr.weather_code) : null;
 
@@ -143,6 +152,7 @@ export function CityComparison() {
             : '--';
 
           const precipProb = weather?.hourly?.precipitation_probability?.[0] ?? curr?.precipitation ?? 0;
+          const aqiVal = aqiData?.european_aqi ?? aqiData?.us_aqi ?? null;
 
           return (
             <motion.div
@@ -250,7 +260,18 @@ export function CityComparison() {
                       <span>UV Index</span>
                     </div>
                     <span className="font-semibold text-white">
-                      {curr?.uv_index ? curr.uv_index.toFixed(1) : '0.0'}
+                      {curr?.uv_index !== undefined && curr?.uv_index !== null ? curr.uv_index.toFixed(1) : 'N/A'}
+                    </span>
+                  </div>
+
+                  {/* Real Air Quality (AQI) */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5 text-slate-400">
+                      <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Air Quality (AQI)</span>
+                    </div>
+                    <span className={`font-semibold ${aqiVal !== null ? (aqiVal <= 50 ? 'text-emerald-400' : aqiVal <= 100 ? 'text-amber-400' : 'text-rose-400') : 'text-slate-400'}`}>
+                      {aqiVal !== null ? `${Math.round(aqiVal)} AQI` : 'N/A'}
                     </span>
                   </div>
                 </div>

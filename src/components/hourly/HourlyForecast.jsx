@@ -152,32 +152,124 @@ export function HourlyForecast() {
                   </span>
                 )}
               </div>
-
-              {/* Expanded Hover/Selected Detail Tray */}
-              <AnimatePresence>
-                {(isSelected || hoveredIdx === h.index) && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="mt-2 pt-2 border-t border-white/10 w-full text-[10px] text-slate-300 space-y-1"
-                  >
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Feels</span>
-                      <span>{apparent}°</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Wind</span>
-                      <span>{wind} {units.wind}</span>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </motion.button>
           );
         })}
       </div>
+
+      {/* Interactive Detailed Hour Inspection Drawer */}
+      <AnimatePresence>
+        {selectedHour !== null && weather.hourly?.temperature_2m && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: 'auto' }}
+            exit={{ opacity: 0, y: -8, height: 0 }}
+            transition={{ duration: 0.25 }}
+            className="mt-4 glass-panel rounded-2xl p-4 sm:p-5 border border-sky-500/30 overflow-hidden"
+          >
+            {(() => {
+              const hIdx = selectedHour;
+              const wCode = weather.hourly.weather_code?.[hIdx] ?? 0;
+              const wmo = getWmoInfo(wCode);
+              const IconComp = ICON_MAP[wmo.icon] || Cloud;
+              const tempC = weather.hourly.temperature_2m[hIdx];
+              const appC = weather.hourly.apparent_temperature?.[hIdx] ?? tempC;
+              const tDisp = units.temp === 'F' ? Math.round((tempC * 9) / 5 + 32) : Math.round(tempC);
+              const appDisp = units.temp === 'F' ? Math.round((appC * 9) / 5 + 32) : Math.round(appC);
+              const pProb = weather.hourly.precipitation_probability?.[hIdx] ?? 0;
+              const pSum = weather.hourly.precipitation?.[hIdx] ?? 0;
+              const hum = weather.hourly.relative_humidity_2m?.[hIdx] ?? 0;
+              const dewC = weather.hourly.dew_point_2m?.[hIdx] ?? null;
+              const dewDisp = dewC !== null ? `${units.temp === 'F' ? Math.round((dewC * 9) / 5 + 32) : Math.round(dewC)}°${units.temp}` : 'N/A';
+              const wSpeed = weather.hourly.wind_speed_10m?.[hIdx] ?? 0;
+              const wSpeedDisp = units.wind === 'mph' ? Math.round(wSpeed * 0.621371) : Math.round(wSpeed);
+              const wDir = weather.hourly.wind_direction_10m?.[hIdx];
+              const dirs = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+              const dirName = wDir !== undefined ? dirs[Math.round(wDir / 22.5) % 16] : '';
+              const uv = weather.hourly.uv_index?.[hIdx];
+              const visM = weather.hourly.visibility?.[hIdx];
+              const visDisp = visM ? (units.wind === 'mph' ? `${(visM / 1609.34).toFixed(1)} mi` : `${(visM / 1000).toFixed(1)} km`) : 'N/A';
+              const press = weather.hourly.surface_pressure?.[hIdx];
+
+              return (
+                <div>
+                  <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-white/10">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center">
+                        <IconComp className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-base font-bold text-white">
+                            {String(hIdx).padStart(2, '0')}:00 Inspection
+                          </span>
+                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 font-medium">
+                            Scrubbing Active
+                          </span>
+                        </div>
+                        <div className="text-xs text-slate-300 mt-0.5">
+                          {wmo.label} · Ambient {tDisp}°{units.temp} (Feels like {appDisp}°{units.temp})
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => setSelectedHour(null)}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+                    >
+                      Reset to Live
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-3.5 text-xs">
+                    <div className="p-2.5 rounded-xl bg-white/[0.03]">
+                      <span className="text-[11px] text-slate-400 block">Precipitation</span>
+                      <span className="font-semibold text-white mt-0.5 block">
+                        {pProb}% ({pSum.toFixed(1)} mm)
+                      </span>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-white/[0.03]">
+                      <span className="text-[11px] text-slate-400 block">Humidity & Dew</span>
+                      <span className="font-semibold text-white mt-0.5 block">
+                        {hum}% · {dewDisp}
+                      </span>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-white/[0.03]">
+                      <span className="text-[11px] text-slate-400 block">Wind Flow</span>
+                      <span className="font-semibold text-white mt-0.5 block">
+                        {wSpeedDisp} {units.wind} {dirName}
+                      </span>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-white/[0.03]">
+                      <span className="text-[11px] text-slate-400 block">UV Index</span>
+                      <span className="font-semibold text-white mt-0.5 block">
+                        {uv !== undefined && uv !== null ? uv.toFixed(1) : '0.0'}
+                      </span>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-white/[0.03]">
+                      <span className="text-[11px] text-slate-400 block">Visibility</span>
+                      <span className="font-semibold text-white mt-0.5 block">
+                        {visDisp}
+                      </span>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-white/[0.03]">
+                      <span className="text-[11px] text-slate-400 block">Surface Pressure</span>
+                      <span className="font-semibold text-white mt-0.5 block">
+                        {press ? `${Math.round(press)} hPa` : 'N/A'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

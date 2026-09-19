@@ -5,6 +5,7 @@ const NAV_ITEMS = [
   { id: 'hero-section', label: 'Atmosphere' },
   { id: 'timeline-section', label: 'Timeline' },
   { id: 'hourly-section', label: 'Hourly' },
+  { id: 'details-section', label: 'Telemetry' },
   { id: 'forecast-section', label: '7-Day' },
   { id: 'map-section', label: 'Map' },
   { id: 'globe-section', label: 'Planet 3D' },

@@ -209,7 +209,7 @@ export function SevenDayForecast() {
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.25, ease: 'easeInOut' }}
                   >
-                    <div className="px-4 pb-4 pt-2 border-t border-white/5 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                    <div className="px-4 pb-4 pt-2 border-t border-white/5 grid grid-cols-2 sm:grid-cols-5 gap-3 text-xs">
                       <div className="p-2.5 rounded-xl bg-white/[0.02]">
                         <div className="text-slate-400 flex items-center gap-1 mb-1">
                           <Wind className="w-3.5 h-3.5 text-sky-400" />
@@ -219,6 +219,16 @@ export function SevenDayForecast() {
                           {units.wind === 'mph'
                             ? `${Math.round(d.windMax * 0.621371)} mph`
                             : `${Math.round(d.windMax)} km/h`}
+                        </div>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-white/[0.02]">
+                        <div className="text-slate-400 flex items-center gap-1 mb-1">
+                          <Droplets className="w-3.5 h-3.5 text-blue-400" />
+                          <span>Rainfall Sum</span>
+                        </div>
+                        <div className="font-semibold text-slate-200">
+                          {d.precipSum.toFixed(1)} mm
                         </div>
                       </div>
 
