@@ -6,11 +6,10 @@ import {
   Bike,
   Camera,
   Trophy,
-  Car,
   Plane,
   BookOpen,
+  Sun,
   Clock,
-  Sparkles,
   Compass,
 } from 'lucide-react';
 import { useWeatherStore } from '../../store/weatherStore';
@@ -22,9 +21,9 @@ const ICON_MAP = {
   Bike,
   Camera,
   Trophy,
-  Car,
   Plane,
   BookOpen,
+  Sun,
 };
 
 export function ActivityMode() {
@@ -35,23 +34,33 @@ export function ActivityMode() {
 
   const analysis = analyzeActivity(selectedActivity, weather);
 
+  const statusBadgeClass =
+    analysis.status === 'GOOD CONDITIONS'
+      ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+      : analysis.status === 'MODERATE CONDITIONS'
+      ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+      : 'bg-rose-500/15 text-rose-300 border-rose-500/30';
+
   return (
     <div className="glass-panel rounded-3xl p-5 sm:p-7">
       {/* Header */}
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-400">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
             <Compass className="w-4 h-4" />
           </div>
           <div>
+            <div className="text-[10px] uppercase tracking-widest text-sky-400 font-bold">
+              Should I Go Out?
+            </div>
             <h3 className="text-base sm:text-lg font-semibold text-white">
               What are you planning today?
             </h3>
-            <p className="text-xs text-slate-400">
-              Personalized weather analysis and recommended time windows
-            </p>
           </div>
         </div>
+        <span className="text-xs text-slate-400">
+          Real-time weather suitability &amp; best time windows
+        </span>
       </div>
 
       {/* Activity Pills Selector */}
@@ -90,24 +99,25 @@ export function ActivityMode() {
           {/* Top Rating & Summary Card */}
           <div className="p-4 sm:p-5 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2.5 mb-1.5">
-                <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
-                  Suitability Status
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <span className={`px-2.5 py-1 rounded-full text-[11px] font-bold tracking-wider uppercase border ${statusBadgeClass}`}>
+                  {analysis.status || 'GOOD CONDITIONS'}
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-500/20 text-sky-300 border border-sky-500/30">
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/25">
                   {analysis.suitability}
                 </span>
               </div>
               <p className="text-sm text-slate-200 leading-relaxed max-w-2xl">
+                <span className="text-slate-400 font-semibold mr-1.5">Reason:</span>
                 {analysis.summary}
               </p>
             </div>
 
             {/* Recommended Windows */}
-            <div className="shrink-0 p-3 rounded-xl bg-sky-500/10 border border-sky-500/20">
+            <div className="shrink-0 p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/20">
               <div className="text-[11px] font-semibold text-sky-400 flex items-center gap-1.5 uppercase tracking-wider mb-1">
                 <Clock className="w-3.5 h-3.5" />
-                <span>Prime Windows</span>
+                <span>Recommended Time</span>
               </div>
               <div className="space-y-0.5">
                 {analysis.bestWindows.map((win, idx) => (

@@ -229,10 +229,49 @@ export function SunMoonArc() {
             <Sunset className="w-4 h-4" />
           </div>
         </div>
+
+        {/* Linear Daylight Timeline Strip */}
+        <div className="mt-4 p-3 rounded-2xl bg-white/[0.02] border border-white/5">
+          <div className="flex items-center justify-between text-[11px] text-slate-300 font-medium mb-2">
+            <span>🌅 Sunrise {formatTime(sunriseDate)}</span>
+            <span className="text-amber-300 font-semibold">
+              ● NOW {formatTime(new Date())}
+            </span>
+            <span>🌇 Sunset {formatTime(sunsetDate)}</span>
+          </div>
+          <div className="relative h-1.5 w-full rounded-full bg-white/10 overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${
+                isDaytime
+                  ? 'bg-gradient-to-r from-amber-400 via-yellow-300 to-orange-400'
+                  : 'bg-gradient-to-r from-indigo-500 to-sky-400'
+              }`}
+              style={{
+                width: `${Math.min(100, Math.max(5, (isDaytime ? progress : nightProgress) * 100))}%`,
+              }}
+            />
+          </div>
+          <div className="flex items-center justify-between text-[11px] text-slate-400 mt-2">
+            <span>
+              Remaining daylight:{' '}
+              <strong className="text-slate-200">
+                {isDaytime
+                  ? `${Math.floor(sunsetH - currentHour)}h ${Math.round(((sunsetH - currentHour) % 1) * 60)}m`
+                  : '0h 0m (Sun has set)'}
+              </strong>
+            </span>
+            <span>
+              Total daylight:{' '}
+              <strong className="text-slate-200">
+                {daylightHours}h {daylightMinutes}m
+              </strong>
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Moon Phase Banner */}
-      <div className="mt-5 pt-4 border-t border-white/5 flex items-center justify-between">
+      <div className="mt-4 pt-3.5 border-t border-white/5 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-300">
             <Moon className="w-4 h-4" />

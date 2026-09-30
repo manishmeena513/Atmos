@@ -74,7 +74,7 @@ export function AirQualitySection() {
             <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-slate-400 mb-3">
               <Info className="w-6 h-6" />
             </div>
-            <h4 className="text-base font-semibold text-white">Air Quality Data Unavailable</h4>
+            <h4 className="text-base font-semibold text-white">Air quality data unavailable.</h4>
             <p className="text-xs text-slate-400 max-w-sm mt-1.5 leading-relaxed">
               Real-time atmospheric air quality telemetry is currently unavailable from Open-Meteo monitoring stations for this location.
             </p>
@@ -104,9 +104,50 @@ export function AirQualitySection() {
   const pollutants = [
     { name: 'PM2.5', value: formatPollutant(curr.pm2_5), status: getPollutantStatus(curr.pm2_5, 25) },
     { name: 'PM10', value: formatPollutant(curr.pm10), status: getPollutantStatus(curr.pm10, 50) },
-    { name: 'Ozone (O₃)', value: formatPollutant(curr.ozone), status: typeof curr.ozone === 'number' && !isNaN(curr.ozone) ? 'Normal' : 'N/A' },
-    { name: 'Nitrogen (NO₂)', value: formatPollutant(curr.nitrogen_dioxide), status: typeof curr.nitrogen_dioxide === 'number' && !isNaN(curr.nitrogen_dioxide) ? 'Low' : 'N/A' },
+    { name: 'Ozone (O₃)', value: formatPollutant(curr.ozone), status: typeof curr.ozone === 'number' && !isNaN(curr.ozone) ? (curr.ozone > 100 ? 'Elevated' : 'Normal') : 'N/A' },
+    { name: 'Nitrogen (NO₂)', value: formatPollutant(curr.nitrogen_dioxide), status: typeof curr.nitrogen_dioxide === 'number' && !isNaN(curr.nitrogen_dioxide) ? (curr.nitrogen_dioxide > 40 ? 'Elevated' : 'Low') : 'N/A' },
   ];
+
+  // Determine what is driving air quality based on relative ratios to reference thresholds
+  const driverRatios = [
+    {
+      label: 'PM2.5 fine particulate matter',
+      ratio: typeof curr.pm2_5 === 'number' ? curr.pm2_5 / 25 : 0,
+      explanation:
+        curr.pm2_5 > 25
+          ? `PM2.5 (${curr.pm2_5.toFixed(1)} µg/m³) is the main contributor to reduced air quality today.`
+          : `Fine particulate matter (PM2.5 at ${curr.pm2_5?.toFixed(1) ?? 0} µg/m³) remains well within clean atmospheric limits.`,
+    },
+    {
+      label: 'PM10 coarse particulates',
+      ratio: typeof curr.pm10 === 'number' ? curr.pm10 / 50 : 0,
+      explanation:
+        curr.pm10 > 50
+          ? `PM10 dust and coarse particles (${curr.pm10.toFixed(1)} µg/m³) are the primary driver of current air quality levels.`
+          : `Coarse particulate levels (PM10 at ${curr.pm10?.toFixed(1) ?? 0} µg/m³) are low across the area.`,
+    },
+    {
+      label: 'Surface Ozone (O₃)',
+      ratio: typeof curr.ozone === 'number' ? curr.ozone / 100 : 0,
+      explanation:
+        curr.ozone > 100
+          ? `Surface Ozone (${curr.ozone.toFixed(1)} µg/m³) is the primary contributor to current air quality readings.`
+          : `Ground-level Ozone (${curr.ozone?.toFixed(1) ?? 0} µg/m³) is currently the highest relative trace gas but remains within normal bounds.`,
+    },
+    {
+      label: 'Nitrogen Dioxide (NO₂)',
+      ratio: typeof curr.nitrogen_dioxide === 'number' ? curr.nitrogen_dioxide / 40 : 0,
+      explanation:
+        curr.nitrogen_dioxide > 40
+          ? `Nitrogen Dioxide (${curr.nitrogen_dioxide.toFixed(1)} µg/m³) is the primary contributor to current air quality.`
+          : `Nitrogen Dioxide levels (${curr.nitrogen_dioxide?.toFixed(1) ?? 0} µg/m³) remain low.`,
+    },
+  ].sort((a, b) => b.ratio - a.ratio);
+
+  const primaryDriverText =
+    driverRatios[0]?.ratio > 0
+      ? driverRatios[0].explanation
+      : 'All measured atmospheric pollutants are at low background concentrations.';
 
   return (
     <div className="glass-panel rounded-3xl p-5 sm:p-7 flex flex-col justify-between">
@@ -127,7 +168,7 @@ export function AirQualitySection() {
         </div>
 
         {/* AQI Score Dial / Banner */}
-        <div className="flex items-center gap-5 p-4 rounded-2xl bg-white/[0.02] border border-white/5 mb-5">
+        <div className="flex items-center gap-5 p-4 rounded-2xl bg-white/[0.02] border border-white/5 mb-4">
           {/* Circular Badge */}
           <div
             className="w-16 h-16 rounded-2xl flex flex-col items-center justify-center shrink-0 border"
@@ -155,6 +196,16 @@ export function AirQualitySection() {
           </div>
         </div>
 
+        {/* What's Driving Air Quality? */}
+        <div className="p-3.5 rounded-2xl bg-white/[0.025] border border-white/5 mb-4">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-1">
+            What&apos;s Driving Air Quality?
+          </div>
+          <p className="text-xs text-slate-200 leading-relaxed">
+            {primaryDriverText}
+          </p>
+        </div>
+
         {/* Pollutants Breakdown Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
           {pollutants.map((p, idx) => (
@@ -168,7 +219,7 @@ export function AirQualitySection() {
               <div className="text-sm font-semibold text-slate-100 my-1">
                 {p.value}
               </div>
-              <div className="text-[10px] text-emerald-400 font-medium">
+              <div className={`text-[10px] font-medium ${p.status === 'Elevated' ? 'text-amber-400' : 'text-emerald-400'}`}>
                 {p.status}
               </div>
             </div>

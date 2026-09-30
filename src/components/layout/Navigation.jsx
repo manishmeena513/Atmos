@@ -2,17 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
 const NAV_ITEMS = [
-  { id: 'hero-section', label: 'Atmosphere' },
+  { id: 'hero-section', label: 'Daily Brief' },
   { id: 'timeline-section', label: 'Timeline' },
   { id: 'hourly-section', label: 'Hourly' },
-  { id: 'details-section', label: 'Telemetry' },
-  { id: 'forecast-section', label: '7-Day' },
-  { id: 'map-section', label: 'Map' },
-  { id: 'globe-section', label: 'Planet 3D' },
-  { id: 'compare-section', label: 'Compare' },
-  { id: 'airquality-section', label: 'Air Quality' },
+  { id: 'intelligence-section', label: 'Day Guide' },
   { id: 'insights-section', label: 'Insights' },
-  { id: 'activity-section', label: 'Activities' },
+  { id: 'activity-section', label: 'Go Out?' },
+  { id: 'forecast-section', label: '7-Day' },
+  { id: 'details-section', label: 'Telemetry' },
+  { id: 'airquality-section', label: 'Air & Sun' },
+  { id: 'compare-section', label: 'Compare' },
 ];
 
 export function Navigation() {

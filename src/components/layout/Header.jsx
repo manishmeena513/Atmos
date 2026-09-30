@@ -53,13 +53,13 @@ export function Header({ onOpenSearch, onOpenSettings, onEnterImmersive }) {
         {/* Center: City Search Trigger Pill */}
         <button
           onClick={onOpenSearch}
-          className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl glass-panel glass-panel-hover text-xs sm:text-sm font-medium text-slate-200 border border-white/10 hover:border-sky-400/40 cursor-pointer max-w-[150px] sm:max-w-xs truncate"
-          title="Click to search city"
+          className="flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl glass-panel glass-panel-hover text-xs sm:text-sm font-medium text-slate-200 border border-white/10 hover:border-sky-400/40 cursor-pointer max-w-[165px] sm:max-w-sm truncate"
+          title="Where are you going? Click to search city"
         >
           <MapPin className="w-3.5 h-3.5 text-sky-400 shrink-0" />
-          <span className="truncate">{location.name}</span>
-          <span className="text-slate-500 text-[11px] hidden sm:inline">
-            · Search
+          <span className="truncate font-semibold">{location.name}</span>
+          <span className="text-slate-400 text-[11px] hidden sm:inline">
+            · Where are you going?
           </span>
         </button>
 

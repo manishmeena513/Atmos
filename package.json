@@ -9,15 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@types/three": "^0.186.0",
     "dayjs": "^1.11.13",
     "framer-motion": "^11.15.0",
     "lucide-react": "^0.468.0",
-    "mapbox-gl": "^3.31.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "recharts": "^2.15.0",
-    "three": "^0.186.0",
     "zustand": "^5.0.2"
   },
   "devDependencies": {

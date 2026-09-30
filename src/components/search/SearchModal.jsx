@@ -149,7 +149,7 @@ export function SearchModal({ isOpen, onClose }) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Search global cities (e.g. Paris, Tokyo, New York)..."
+                placeholder="Where are you going? (e.g. Jaipur, Delhi, Mumbai, London)..."
                 className="w-full bg-white/[0.05] border border-white/10 focus:border-sky-400/60 rounded-2xl pl-12 pr-12 py-3.5 text-sm sm:text-base text-white placeholder:text-slate-400 focus:outline-none transition-all"
               />
 

@@ -1,120 +1,66 @@
-# Atmos — Living Atmospheric Weather System
+# Atmos — Premium Weather Intelligence Experience
 
 [![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Three.js](https://img.shields.io/badge/Three.js-WebGL-black?style=flat-square&logo=three.js&logoColor=white)](https://threejs.org/)
-[![Mapbox](https://img.shields.io/badge/Mapbox_GL_JS-3.3-000000?style=flat-square&logo=mapbox&logoColor=white)](https://www.mapbox.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
 > **Live Production Deployment**: [https://atmos-gules-two.vercel.app/](https://atmos-gules-two.vercel.app/)
+>
+> *"Don't just show the weather. Explain the day."*
 
-**Atmos** is a premium, high-fidelity living atmospheric weather application engineered with React, Three.js, Mapbox GL JS, and Framer Motion. Powered by Open-Meteo APIs, Atmos bridges real-time meteorological data with real-time digital twin graphics — delivering responsive weather animations, interactive geographic maps, and planetary visualizations without compromise.
+**Atmos V2.0** is a cinematic, human-centered weather intelligence application engineered with React, Tailwind CSS, Zustand, and Framer Motion. Powered by high-resolution Open-Meteo atmospheric models, Atmos transforms raw meteorological telemetry into clear daily briefings, actionable outdoor guidance, and reactive living sky visuals.
 
 ---
 
-## ✨ Features
+## ✨ Key V2.0 Features
 
-### 🌌 Dynamic Living Atmospheric Canvas
-- **Procedural Weather Physics**: Real-time canvas particle systems simulating rain, snow, mist, thunder, and cloud cover driven directly by current meteorological telemetry (precipitation rate, wind speed, cloud density, and daylight status).
-- **Sun & Moon Position Simulation**: Celestial trajectories calculated accurately based on local sunrise/sunset timings and geographic latitude.
-- **Glassmorphic UI**: Ultra-thin glass panels with dynamic backdrop blur, subtle borders, and depth layering optimized for high-refresh desktop and mobile viewports.
+### 🌅 Atmos Daily Brief
+- **Time-Aware Greeting**: Greets users (`GOOD MORNING`, `GOOD AFTERNOON`, `GOOD EVENING`, `GOOD NIGHT`) alongside current and apparent temperatures.
+- **Natural-Language Day Summary**: Explains what the day will feel like, when temperatures peak, and whether rain or wind will impact plans.
+- **4-Part Diurnal Breakdown**: Summarizes **Morning**, **Afternoon**, **Evening**, and **Night** temperatures and conditions from real hourly data.
 
-### 🗺️ Interactive Location Map
-- **High-Precision Mapbox Base**: Cartographic vector dark style base map powered by Mapbox GL JS with smooth pan, zoom, and hardware-accelerated rendering.
-- **Location Pinning**: Pulsing target indicator dynamically pinned to active location coordinates with instant recenter and coordinate diagnostics.
-- **Cooperative Controls**: Smooth touch and scroll gesture isolation ensuring comfortable map inspection on all devices.
+### ⏱️ Interactive Weather Timeline & Time Machine
+- **24-Hour Scrubber**: Smoothly scrub through today's hourly progression to watch the atmospheric sky and metrics respond in real time.
+- **Expandable Hourly Cards**: Inspect formatted hourly slots (`08 AM`, `09 AM` / 24h) with temperature, feels-like, precipitation probability, wind speed, **wind gusts**, UV index, and humidity.
 
-### 🌍 3D Digital Twin Earth
-- **WebGL Planetary System**: Rendered with Three.js featuring dual-texture day/night terminators, dynamic cloud layers, atmospheric Rayleigh glow shader, and specular ocean reflections.
-- **Geographic Pinning**: Real-time lat/lon coordinate plotting with radiating pulse waves indicating current observation locations.
-- **Graceful Fault Tolerance**: Automatic WebGL fallback states with full GPU memory disposal on unmount to prevent resource leaks.
+### 🧠 Day Intelligence Suite
+- **Rain Intelligence**: Detects rain windows across the next 24 hours, identifies peak probability timing, and renders a 24-hour precipitation probability bar chart (with a clean `"Rain forecast unavailable."` fallback if data is missing).
+- **What Should I Wear?**: Generates practical, non-medical clothing and gear suggestions based on real temperature, UV index, wind speed, and rain probability.
+- **Atmos Comfort (`0–100`)**: Transparent, rule-based comfort indicator breaking down **Temperature**, **Humidity**, **Wind**, **Rain Risk**, and **UV Exposure**.
 
-### 📊 Comprehensive Meteorological Telemetry
-- **Hourly Scrubber & Timeline**: Scroll-snapping 24-hour strip displaying temperature, apparent feels-like curves, weather glyphs, and precipitation probability.
-- **7-Day Dynamic Forecast**: Expandable multi-day forecast cards featuring high/low temperature bars, precipitation accumulations, and dominant wind conditions.
-- **Environmental Metrics**: Direct readings for UV index, surface pressure, atmospheric humidity, dew point, visibility, and daylight progression.
+### 💡 Weather Insights, Trends & Changes
+- **Weather Changes Alert Strip**: Highlights upcoming rain windows, rising afternoon gusts, elevated UV, or rapid evening cooling.
+- **What This Weather Means**: Translates humidity, wind, UV, and apparent temperature into plain English.
+- **Weather Trend**: Summarizes directional shifts in **Temperature**, **Wind**, **Rain**, and **Humidity** over the next 12 hours.
+
+### 🏃 "Should I Go Out?" Activity Engine
+- Evaluates 8 real-world activities (**Walking**, **Running**, **Cycling**, **Photography**, **Outdoor Study**, **Sports**, **Travel**, **General Outdoor**) with `GOOD CONDITIONS`, `MODERATE CONDITIONS`, or `POOR CONDITIONS` status badges, plain-language weather reasons, and prime time windows.
+
+### 📅 Advanced 7-Day Forecast & Daylight Cycle
+- **Expandable 7-Day Outlook**: Daily high/low temperature range bars with accordion inspection for UV peak, wind max, precipitation totals (`mm`), sunrise, and sunset.
+- **Sun & Moon Progression**: Visual solar/lunar arc plus a linear daylight timeline (`🌅 Sunrise ───● NOW ─── 🌇 Sunset`) displaying remaining and total daylight duration.
 
 ### 🍃 Honest Air Quality Index (AQI)
-- **Multi-Standard Support**: European AQI (EAQI) and US AQI scale gauges.
-- **Pollutant Breakdown**: Granular microgram metrics for PM2.5, PM10, Nitrogen Dioxide ($\text{NO}_2$), Ozone ($\text{O}_3$), Sulphur Dioxide ($\text{SO}_2$), and Carbon Monoxide ($\text{CO}$).
-- **Zero-Fabrication Architecture**: If ground atmospheric stations lack air quality telemetry for remote areas, Atmos truthfully indicates data unavailability rather than displaying synthetic numbers.
+- **European AQI & Pollutant Breakdown**: Live readings for PM2.5, PM10, Ozone ($\text{O}_3$), and Nitrogen Dioxide ($\text{NO}_2$).
+- **"What's Driving Air Quality?"**: Automatically identifies the primary pollutant contributor from real station data.
+- **Strict Zero-Fabrication Guard**: Displays `"Air quality data unavailable."` if monitoring data is unavailable — never fabricated numbers.
 
-### 🔍 Global Geocoding & Bookmarks
-- **Instant Search**: Typeahead city searching powered by Open-Meteo Geocoding API with population and administrative hierarchy metadata.
-- **Favorite Locations**: LocalStorage-persisted bookmarks for instant switching between tracked global metropolitan centers.
-- **Device Geolocation**: Browser-native coordinate detection with reverse geocoding to automatically load local conditions.
+### 📤 Shareable Weather Card & Saved Cities
+- **Share Weather Card**: Generate a high-resolution visual weather card (`PNG` download or one-tap copy/share) ready for WhatsApp, Instagram, and social sharing.
+- **Saved Cities Switcher**: Pin favorite global cities with live temperature and condition badges for instant switching.
 
 ---
 
 ## 🛠️ Architecture & Tech Stack
 
-```
-                                ┌────────────────────────────────┐
-                                │     User Browser / Client      │
-                                └───────────────┬────────────────┘
-                                                │
-                 ┌──────────────────────────────┴──────────────────────────────┐
-                 ▼                                                             ▼
-    ┌──────────────────────────┐                                  ┌──────────────────────────┐
-    │     Vite / React App     │                                  │   Vercel Edge / Node     │
-    │  (Zustand + Framer)      │                                  │    API Serverless        │
-    └────────────┬─────────────┘                                  └────────────┬─────────────┘
-                 │                                                             │
-      ┌──────────┴──────────┐                                                  │
-      ▼                     ▼                                                  ▼
-┌─────────────┐       ┌─────────────┐                                    ┌─────────────┐
-│ Three.js    │       │ Mapbox GL   │                                    │ Open-Meteo  │
-│ WebGL Globe │       │ Canvas Base │                                    │ APIs        │
-└─────────────┘       └─────────────┘                                    └─────────────┘
-```
-
-- **Frontend Core**: React 18, Vite 6, Zustand (atomic state store), Framer Motion
-- **Styling**: Tailwind CSS, Lucide Icons, Custom CSS Glassmorphism
-- **Visual Computing**: Three.js (WebGL Earth), HTML5 2D Canvas (Rain/Snow engines), Mapbox GL JS (Vector Map)
-- **Data & APIs**:
-  - **Open-Meteo Forecast API**: High-resolution hourly and daily weather telemetry (No API key required)
-  - **Open-Meteo Air Quality API**: Atmospheric chemistry and particulate data
-  - **Open-Meteo Geocoding API**: Global city name resolution
-  - **Nominatim / OpenStreetMap**: Safe reverse-geocoding fallback
-
----
-
-## 📂 Project Structure
-
-```
-Atmos/
-├── api/                     # Vercel Serverless proxy functions
-│   ├── airquality.js        # Air quality proxy with origin validation
-│   ├── geocode.js           # Search geocoder proxy
-│   └── weather.js           # Weather telemetry proxy with edge cache
-├── public/                  # Static textures and icons
-│   ├── earth-blue-marble.jpg
-│   ├── earth-clouds.jpg
-│   ├── earth-night.jpg
-│   └── earth-specular.jpg
-├── src/
-│   ├── api/
-│   │   └── openmeteo.js     # Unified client-side API layer & coordinate fallbacks
-│   ├── components/
-│   │   ├── airquality/      # Air quality gauges & pollutant grid
-│   │   ├── forecast/        # Hourly timeline & 7-day forecast cards
-│   │   ├── globe/           # Three.js 3D Earth digital twin
-│   │   ├── hero/            # Hero temperature, sun/moon position, condition
-│   │   ├── layout/          # Top navigation, search modal, settings sheet
-│   │   ├── map/             # Mapbox interactive location map
-│   │   ├── metrics/         # UV, humidity, pressure, visibility widgets
-│   │   └── weather/         # Particle background canvas (Rain, Snow, Stars)
-│   ├── store/
-│   │   └── weatherStore.js  # Zustand state management (units, search, caches)
-│   ├── styles/
-│   │   └── index.css        # Glassmorphism, scrollbars, responsive rules
-│   ├── App.jsx              # Main dashboard composition
-│   └── main.jsx             # React DOM entrypoint
-├── package.json
-├── tailwind.config.js
-└── vite.config.js           # Rollup chunking & dev API proxy middleware
-```
+- **Frontend Core**: React 18, Vite 6, Zustand (persisted state store), Framer Motion
+- **Styling & Visuals**: Tailwind CSS, Lucide Icons, HTML5 2D Atmospheric Canvas (procedural sky, clouds, rain, snow, stars, and lightning)
+- **Serverless API Layer**: Vercel Node/Edge functions (`/api/weather`, `/api/airquality`, `/api/geocode`) with caching and validation
+- **Data Providers**:
+  - **Open-Meteo Forecast API**: High-resolution current, hourly, and 7-day weather telemetry (No API key required)
+  - **Open-Meteo Air Quality API**: Real-time particulate and trace gas telemetry
+  - **Open-Meteo Geocoding API** & **OpenStreetMap Nominatim**: Global city search and reverse geocoding
 
 ---
 
@@ -122,7 +68,7 @@ Atmos/
 
 ### Prerequisites
 - Node.js 18.0.0 or higher
-- npm or pnpm / yarn
+- npm
 
 ### 1. Clone & Install
 ```bash
@@ -131,56 +77,23 @@ cd Atmos
 npm install
 ```
 
-### 2. Configure Environment Variables
-Create a `.env` file in the root directory:
-
-```env
-# Optional: Mapbox public access token for vector base maps.
-# If omitted, Atmos automatically falls back to CartoDB dark matter tiles.
-VITE_MAPBOX_TOKEN=your_mapbox_public_token_here
-```
-
-### 3. Start Development Server
+### 2. Start Development Server
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) in your browser. The embedded Vite proxy automatically emulates Vercel's serverless `/api` routes locally.
+Open [http://localhost:3000](http://localhost:3000) in your browser. No API keys or `.env` secrets are required.
 
-### 4. Build for Production
+### 3. Build for Production
 ```bash
 npm run build
 ```
-Generates optimized, tree-shaken static bundles in `dist/` with split vendor chunks for React, Framer Motion, Recharts, Mapbox, and Three.js.
-
----
-
-## 🔒 Reliability & Quality Engineering (v2.0.0)
-
-- **Strict Zero-Fabrication Metric Guard**: Fake static fallback values (e.g. synthetic AQI ratings) have been eliminated. Missing metrics display informative, non-intrusive unavailable states.
-- **Advanced Meteorological Telemetry**: Real-time dew point, UV exposure index, 3-hour barometric pressure trends, and optical visibility distance with deterministic rule-based natural language insights.
-- **Interactive Hourly Inspection Drawer**: Seamless touch-scroll 24-hour forecast with interactive hour inspection panel and instant Reset to Live control.
-- **Enhanced 7-Day Forecast**: Multi-day outlook with expandable accordions detailing precipitation sums (mm), peak wind gusts, UV peak, sunrise, and sunset.
-- **3D Earth Digital Twin**: Smooth camera spherical interpolation to focused city, glowing favorite pins, and `IntersectionObserver` RAF throttling for battery/GPU efficiency.
-- **Live Pinned Locations**: Pinned favorite cities display live temperature badges and condition glyphs with one-tap switching.
-- **Global Comparison Matrix**: Multi-city comparison stage cross-evaluating temperatures, humidity, wind, UV, and genuine air quality telemetry.
-- **Cooperative Viewport Interaction**: Three.js Earth and canvas modules feature cooperative scroll zooming (`Ctrl + Scroll` / `Meta + Scroll`) and vertical pan pass-through (`touch-action: pan-y`) to prevent touch lock on mobile devices.
-- **Hardware Resource Teardown**: Comprehensive WebGL texture, geometry, and renderer disposal on unmount guarantees zero GPU memory accumulation during prolonged browsing sessions.
-
----
-
-## 🌐 Data Providers & Credits
-
-- Weather telemetry, hourly/daily forecasts, and air quality: [Open-Meteo](https://open-meteo.com/)
-- Cartographic vector base maps: [Mapbox](https://www.mapbox.com/)
-- Digital twin planetary textures: [NASA Earth Observatory](https://visibleearth.nasa.gov/)
-- Geocoding and reverse location services: [Open-Meteo Geocoding](https://open-meteo.com/en/docs/geocoding-api) & [OpenStreetMap Nominatim](https://nominatim.openstreetmap.org/)
 
 ---
 
 ## 👨‍💻 Developer & Copyright
 
-**Atmos** is designed and developed by **Manish Meena**.  
-© 2026 Atmos. All rights reserved.
+- **Developer**: Manish Meena
+- **Copyright**: © 2026 Atmos. All rights reserved. Developed by Manish Meena.
 
 ---
 

@@ -22,6 +22,8 @@ export const useWeatherStore = create(
       airQuality: null,
       location: DEFAULT_LOCATION,
       loading: true,
+      isTransitioning: false,
+      lastUpdated: null,
       error: null,
 
       // Time Machine & Timeline Scrubbing
@@ -40,6 +42,8 @@ export const useWeatherStore = create(
       // History & Favorites (Persisted)
       recentSearches: [
         { name: 'Meerut', country: 'India', lat: 28.9845, lon: 77.7064 },
+        { name: 'New Delhi', country: 'India', lat: 28.6139, lon: 77.209 },
+        { name: 'Mumbai', country: 'India', lat: 19.076, lon: 72.8777 },
         { name: 'Tokyo', country: 'Japan', lat: 35.6895, lon: 139.6917 },
         { name: 'London', country: 'United Kingdom', lat: 51.5074, lon: -0.1278 },
         { name: 'New York', country: 'United States', lat: 40.7128, lon: -74.006 },
@@ -47,14 +51,20 @@ export const useWeatherStore = create(
       ],
       favorites: [
         { id: 'meerut', name: 'Meerut', country: 'India', lat: 28.9845, lon: 77.7064 },
+        { id: 'new-delhi', name: 'New Delhi', country: 'India', lat: 28.6139, lon: 77.209 },
+        { id: 'mumbai', name: 'Mumbai', country: 'India', lat: 19.076, lon: 72.8777 },
         { id: 'tokyo', name: 'Tokyo', country: 'Japan', lat: 35.6895, lon: 139.6917 },
         { id: 'london', name: 'London', country: 'United Kingdom', lat: 51.5074, lon: -0.1278 },
-        { id: 'reykjavik', name: 'Reykjavik', country: 'Iceland', lat: 64.1466, lon: -21.9426 },
       ],
 
       // Actions
       setLocation: (loc) => {
-        set({ location: loc, selectedHour: null });
+        const hasExistingWeather = Boolean(get().weather);
+        set({
+          location: loc,
+          selectedHour: null,
+          isTransitioning: hasExistingWeather,
+        });
         get().fetchData(loc.lat, loc.lon);
         get().addRecentSearch(loc);
       },
@@ -148,14 +158,16 @@ export const useWeatherStore = create(
             weather: weatherData.value,
             airQuality: aqData.status === 'fulfilled' && aqData.value ? aqData.value : { current: null, error: 'AQI_UNAVAILABLE' },
             loading: false,
+            isTransitioning: false,
+            lastUpdated: new Date().toISOString(),
             error: null,
           });
         } catch (err) {
           if (requestId !== latestRequestId) return;
-          console.error('Weather load error:', err);
           set({
             loading: false,
-            error: err.message || 'Unable to load atmospheric data. Check your connection.',
+            isTransitioning: false,
+            error: err.message || 'Weather data couldn\'t be loaded. Check your connection and try again.',
           });
         }
       },

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Star, X, Sun, Cloud, CloudRain, CloudSun, CloudFog, CloudSnow, CloudLightning, Snowflake } from 'lucide-react';
+import { Star, Plus, X, Sun, Cloud, CloudRain, CloudSun, CloudFog, CloudSnow, CloudLightning, Snowflake } from 'lucide-react';
 import { useWeatherStore } from '../../store/weatherStore';
 import { fetchWeather } from '../../api/openmeteo';
 import { getWmoInfo } from '../../utils/wmoCodeMap';
@@ -15,7 +15,7 @@ const ICON_MAP = {
   CloudLightning,
 };
 
-export function FavoritesCities() {
+export function FavoritesCities({ onOpenSearch }) {
   const favorites = useWeatherStore((s) => s.favorites);
   const location = useWeatherStore((s) => s.location);
   const units = useWeatherStore((s) => s.units);
@@ -66,8 +66,8 @@ export function FavoritesCities() {
       <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none no-scrollbar touch-pan-x overscroll-x-contain">
         <div className="flex items-center gap-1.5 text-xs text-amber-400 font-semibold uppercase tracking-wider shrink-0 mr-1 select-none">
           <Star className="w-3.5 h-3.5 fill-amber-400" />
-          <span className="hidden sm:inline">Pinned Locations</span>
-          <span className="sm:hidden">Pinned</span>
+          <span className="hidden sm:inline">Saved Cities</span>
+          <span className="sm:hidden">Saved</span>
         </div>
 
         {favorites.map((fav) => {
@@ -77,19 +77,21 @@ export function FavoritesCities() {
           const live = telemetry[favKey];
 
           let tempDisplay = null;
+          let conditionLabel = null;
           let IconComp = null;
 
           if (live && live.tempC !== undefined) {
             const tempVal = units.temp === 'F' ? Math.round((live.tempC * 9) / 5 + 32) : Math.round(live.tempC);
-            tempDisplay = `${tempVal}°`;
+            tempDisplay = `${tempVal}°${units.temp}`;
             const wmo = getWmoInfo(live.weatherCode);
+            conditionLabel = wmo.label;
             IconComp = ICON_MAP[wmo.icon] || Cloud;
           }
 
           return (
             <div
               key={favKey}
-              className={`group shrink-0 inline-flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-full text-xs font-medium transition-all duration-200 select-none ${
+              className={`group shrink-0 inline-flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-2xl text-xs font-medium transition-all duration-200 select-none ${
                 isActive
                   ? 'bg-sky-500/20 text-sky-200 border border-sky-400/50 shadow-sm'
                   : 'bg-white/[0.04] text-slate-300 hover:bg-white/[0.08] border border-white/5'
@@ -97,16 +99,21 @@ export function FavoritesCities() {
             >
               <button
                 onClick={() => setLocation(fav)}
-                className="cursor-pointer hover:text-white flex items-center gap-1.5"
+                className="cursor-pointer hover:text-white flex items-center gap-2"
                 aria-label={`Switch to ${fav.name}`}
               >
                 {IconComp && (
                   <IconComp className="w-3.5 h-3.5 text-sky-400 shrink-0" />
                 )}
-                <span>{fav.name}</span>
+                <span className="font-semibold">{fav.name}</span>
                 {tempDisplay && (
-                  <span className="font-bold text-white bg-white/10 px-1.5 py-0.2 rounded-md text-[11px]">
+                  <span className="font-bold text-white bg-white/10 px-1.5 py-0.5 rounded-md text-[11px]">
                     {tempDisplay}
+                  </span>
+                )}
+                {conditionLabel && (
+                  <span className="hidden md:inline text-[11px] text-slate-400">
+                    {conditionLabel}
                   </span>
                 )}
                 {fav.country && !tempDisplay && (
@@ -130,6 +137,16 @@ export function FavoritesCities() {
             </div>
           );
         })}
+
+        {onOpenSearch && (
+          <button
+            onClick={onOpenSearch}
+            className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-2xl text-xs font-medium bg-white/[0.03] hover:bg-white/[0.08] text-slate-400 hover:text-white border border-dashed border-white/15 transition-colors cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Add City</span>
+          </button>
+        )}
       </div>
     </div>
   );
