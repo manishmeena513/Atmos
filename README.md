@@ -1,4 +1,4 @@
-# Atmos — Premium Weather Intelligence Experience
+# Atmos — Premium Living Weather & Personalization Experience
 
 [![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
@@ -9,54 +9,65 @@
 >
 > *"Don't just show the weather. Explain the day."*
 
-**Atmos V2.0** is a cinematic, human-centered weather intelligence application engineered with React, Tailwind CSS, Zustand, and Framer Motion. Powered by high-resolution Open-Meteo atmospheric models, Atmos transforms raw meteorological telemetry into clear daily briefings, actionable outdoor guidance, and reactive living sky visuals.
+**Atmos V2.5** is a cinematic, deeply personalizable, human-centered living weather intelligence experience engineered with React, Tailwind CSS, Zustand, and Framer Motion. Powered by high-resolution Open-Meteo atmospheric models, Atmos transforms raw meteorological telemetry into clear daily briefings, actionable outdoor guidance, interactive "Why?" deep dives, and reactive living sky visuals.
 
 ---
 
-## ✨ Key V2.0 Features
+## ✨ What's New in Atmos V2.5
 
-### 🌅 Atmos Daily Brief
-- **Time-Aware Greeting**: Greets users (`GOOD MORNING`, `GOOD AFTERNOON`, `GOOD EVENING`, `GOOD NIGHT`) alongside current and apparent temperatures.
-- **Natural-Language Day Summary**: Explains what the day will feel like, when temperatures peak, and whether rain or wind will impact plans.
-- **4-Part Diurnal Breakdown**: Summarizes **Morning**, **Afternoon**, **Evening**, and **Night** temperatures and conditions from real hourly data.
+### 🎨 1. Centralized Theme Engine & 10 Presets
+- **10 Master Presets**: Classic Atmos, Weather Reactive (auto-syncs with sky code), Midnight (sapphire/obsidian), AMOLED (pure #000000 black), Sunset, Ocean, Evergreen, Arctic, Aurora, and Minimal Mono.
+- **Luminance Contrast Guard**: Automatically adjusts text contrast and borders to meet WCAG AA standards regardless of custom background or accent choices.
+- **Dynamic CSS Variables**: Seamless DOM injection (`:root`) of `--atmos-accent`, `--atmos-bg`, `--atmos-glow`, `--atmos-surface`, and `--atmos-border`.
 
-### ⏱️ Interactive Weather Timeline & Time Machine
-- **24-Hour Scrubber**: Smoothly scrub through today's hourly progression to watch the atmospheric sky and metrics respond in real time.
-- **Expandable Hourly Cards**: Inspect formatted hourly slots (`08 AM`, `09 AM` / 24h) with temperature, feels-like, precipitation probability, wind speed, **wind gusts**, UV index, and humidity.
+### 🪟 2. Glass Studio
+- **Configurable Levels**: Off, Soft (subtle blur, low opacity), Medium (standard balanced glass), and Strong (deep blur, luminous border).
+- **Fine-Grain Controls**: Custom Blur slider (8–32px), Opacity slider (4–25%), Border style (default, bright, off), and Tint modes (cool sky, warm sunset, custom).
+- **CSS Fallback Guard**: Fully compliant `@supports (-webkit-backdrop-filter: blur(...))` fallback for older browsers.
 
-### 🧠 Day Intelligence Suite
-- **Rain Intelligence**: Detects rain windows across the next 24 hours, identifies peak probability timing, and renders a 24-hour precipitation probability bar chart (with a clean `"Rain forecast unavailable."` fallback if data is missing).
-- **What Should I Wear?**: Generates practical, non-medical clothing and gear suggestions based on real temperature, UV index, wind speed, and rain probability.
-- **Atmos Comfort (`0–100`)**: Transparent, rule-based comfort indicator breaking down **Temperature**, **Humidity**, **Wind**, **Rain Risk**, and **UV Exposure**.
+### ✍️ 3. Typography Studio
+- **5 Curated Typefaces**: Plus Jakarta Sans (default), Outfit (modern geometric), Nunito (soft rounded), Space Grotesk (tech/data), and JetBrains Mono (editorial/developer).
+- **Scale Selector**: Compact, Standard, and Large viewport scaling.
+- **Temperature Display Format**: Toggle between clean (`26°`), spaced (`26 °C`), and compact with unit (`26°C`).
 
-### 💡 Weather Insights, Trends & Changes
-- **Weather Changes Alert Strip**: Highlights upcoming rain windows, rising afternoon gusts, elevated UV, or rapid evening cooling.
-- **What This Weather Means**: Translates humidity, wind, UV, and apparent temperature into plain English.
-- **Weather Trend**: Summarizes directional shifts in **Temperature**, **Wind**, **Rain**, and **Humidity** over the next 12 hours.
+### 🧱 4. Dashboard Builder
+- **Reorderable Sections**: Drag or move sections up/down to customize your personal layout.
+- **Toggle Visibility**: Show or hide any card or intelligence module (Timeline, Hourly, Day Intelligence, Insights, Activity, Forecast, Telemetry, Air Quality, Comparison).
+- **Layout Density**: Compact, Comfortable, or Spacious padding modes.
 
-### 🏃 "Should I Go Out?" Activity Engine
-- Evaluates 8 real-world activities (**Walking**, **Running**, **Cycling**, **Photography**, **Outdoor Study**, **Sports**, **Travel**, **General Outdoor**) with `GOOD CONDITIONS`, `MODERATE CONDITIONS`, or `POOR CONDITIONS` status badges, plain-language weather reasons, and prime time windows.
+### ⚡ 5. Weather Effects & Performance Modes
+- **3 Performance Profiles**:
+  - **Battery Saver**: 30fps cap, pauses off-screen particle systems, disables intense backdrop blurs.
+  - **Balanced**: Standard 60fps, responsive visual animations.
+  - **Cinematic**: Full resolution, high-density celestial particles, rich atmospheric lighting.
+- **Accessibility**: First-class `prefers-reduced-motion` compliance.
 
-### 📅 Advanced 7-Day Forecast & Daylight Cycle
-- **Expandable 7-Day Outlook**: Daily high/low temperature range bars with accordion inspection for UV peak, wind max, precipitation totals (`mm`), sunrise, and sunset.
-- **Sun & Moon Progression**: Visual solar/lunar arc plus a linear daylight timeline (`🌅 Sunrise ───● NOW ─── 🌇 Sunset`) displaying remaining and total daylight duration.
+### 👤 6. Personalization Profiles & Auto-Adapt
+- **Saved Profiles**: Save named configuration presets (e.g., "Work Setup", "Night Walk", "Clean Minimal").
+- **Auto-Adapt Mode**: Dynamically switches presets across the diurnal cycle (Daylight → Sunset → Midnight).
 
-### 🍃 Honest Air Quality Index (AQI)
-- **European AQI & Pollutant Breakdown**: Live readings for PM2.5, PM10, Ozone ($\text{O}_3$), and Nitrogen Dioxide ($\text{NO}_2$).
-- **"What's Driving Air Quality?"**: Automatically identifies the primary pollutant contributor from real station data.
-- **Strict Zero-Fabrication Guard**: Displays `"Air quality data unavailable."` if monitoring data is unavailable — never fabricated numbers.
+### 🔍 7. Weather Deep-Dive ("Why?" Explanations)
+- **Interactive Metric Inspection**: Tap Temperature, Wind, Humidity, UV, Rain, Pressure, Visibility, or AQI.
+- **24-Hour Telemetry Curves**: High-resolution interactive hourly trend curves rendered via Recharts.
+- **Zero Fabrication**: Honest, data-driven explanations derived strictly from real Open-Meteo physical measurements.
 
-### 📤 Shareable Weather Card & Saved Cities
-- **Share Weather Card**: Generate a high-resolution visual weather card (`PNG` download or one-tap copy/share) ready for WhatsApp, Instagram, and social sharing.
-- **Saved Cities Switcher**: Pin favorite global cities with live temperature and condition badges for instant switching.
+### 📅 8. "Plan Your Day" Window Finder & Travel Mode
+- **Activity Matcher**: Select activity (Running, Cycling, Photography, Outdoor Dining, Walking, Stargazing) and duration to identify the ideal window across the next 48 hours (or honestly state *"No ideal window found"*).
+- **Travel Mode**: Instant dual-weather comparison sheet between your origin and destination.
+
+### 📖 9. Weather Memories & Share Studio
+- **Local Weather Journal**: Save snapshots of memorable days with weather badges, notes, and local storage persistence.
+- **Share Studio**: Export high-resolution weather cards in **9:16 Story**, **1:1 Square**, or **16:9 Banner** formats across 5 visual styles (Cinematic, Glass, Minimal, AMOLED, Weather Reactive).
+
+### 📶 10. PWA & Offline Banner
+- Non-intrusive status banner indicating offline cache state and timestamp of last successful meteorological sync.
 
 ---
 
 ## 🛠️ Architecture & Tech Stack
 
-- **Frontend Core**: React 18, Vite 6, Zustand (persisted state store), Framer Motion
+- **Frontend Core**: React 18, Vite 6, Zustand (persisted state store with v2 migration schema), Framer Motion, Recharts
 - **Styling & Visuals**: Tailwind CSS, Lucide Icons, HTML5 2D Atmospheric Canvas (procedural sky, clouds, rain, snow, stars, and lightning)
-- **Serverless API Layer**: Vercel Node/Edge functions (`/api/weather`, `/api/airquality`, `/api/geocode`) with caching and validation
 - **Data Providers**:
   - **Open-Meteo Forecast API**: High-resolution current, hourly, and 7-day weather telemetry (No API key required)
   - **Open-Meteo Air Quality API**: Real-time particulate and trace gas telemetry

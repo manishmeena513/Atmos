@@ -12,6 +12,7 @@ import {
   Sunset,
   Sparkles,
   Info,
+  ChevronRight,
 } from 'lucide-react';
 import { useWeatherStore } from '../../store/weatherStore';
 
@@ -44,6 +45,7 @@ function getDewPointComfort(dewC) {
 export function WeatherDetails() {
   const weather = useWeatherStore((s) => s.weather);
   const units = useWeatherStore((s) => s.units);
+  const openDeepDive = useWeatherStore((s) => s.openDeepDive);
 
   if (!weather?.current) return null;
 
@@ -141,6 +143,7 @@ export function WeatherDetails() {
   const cards = [
     {
       id: 'feels-like',
+      deepDiveKey: 'temperature',
       title: 'Feels Like',
       value: `${apparentVal}°${units.temp}`,
       subtitle: `Ambient: ${tempVal}°${units.temp}`,
@@ -151,6 +154,7 @@ export function WeatherDetails() {
     },
     {
       id: 'humidity-dew',
+      deepDiveKey: 'humidity',
       title: 'Humidity & Dew Point',
       value: `${current.relative_humidity_2m}%`,
       subtitle: `Dew Point: ${dewPointDisplay}`,
@@ -161,6 +165,7 @@ export function WeatherDetails() {
     },
     {
       id: 'pressure',
+      deepDiveKey: 'pressure',
       title: 'Barometric Pressure',
       value: currentPressure ? `${Math.round(currentPressure)} hPa` : 'N/A',
       subtitle: mslPressure ? `MSL: ${Math.round(mslPressure)} hPa` : 'Atmospheric baseline',
@@ -175,6 +180,7 @@ export function WeatherDetails() {
     },
     {
       id: 'visibility',
+      deepDiveKey: 'visibility',
       title: 'Atmospheric Visibility',
       value: visibilityDisplay,
       subtitle: 'Surface optical distance',
@@ -185,6 +191,7 @@ export function WeatherDetails() {
     },
     {
       id: 'uv-index',
+      deepDiveKey: 'uv',
       title: 'UV Solar Index',
       value: uvVal !== null && uvVal !== undefined ? uvVal.toFixed(1) : 'N/A',
       subtitle: `WHO Exposure: ${uvRisk.tier}`,
@@ -195,6 +202,7 @@ export function WeatherDetails() {
     },
     {
       id: 'wind-gusts',
+      deepDiveKey: 'wind',
       title: 'Wind & Peak Gusts',
       value: `${sustainedWind} ${units.wind}`,
       subtitle: `From ${windDir} (${Math.round(current.wind_direction_10m || 0)}°)`,
@@ -207,6 +215,7 @@ export function WeatherDetails() {
     },
     {
       id: 'precipitation',
+      deepDiveKey: 'rain',
       title: 'Precipitation & Clouds',
       value: precipRate > 0 ? `${precipRate.toFixed(1)} mm/h` : '0.0 mm/h',
       subtitle: `Cloud Ceiling: ${cloudPercent}%`,
@@ -223,6 +232,7 @@ export function WeatherDetails() {
     },
     {
       id: 'solar-cycle',
+      deepDiveKey: 'temperature',
       title: 'Daylight & Celestial',
       value: sunriseStr && sunsetStr ? `${sunriseStr} / ${sunsetStr}` : 'N/A',
       subtitle: daily?.daylight_duration?.[0] ? `${(daily.daylight_duration[0] / 3600).toFixed(1)} hrs daylight` : '24-hour diurnal cycle',
@@ -247,7 +257,7 @@ export function WeatherDetails() {
           </h3>
         </div>
         <span className="text-xs text-slate-400">
-          Deterministic meteorological analysis
+          Tap card for 24h deep-dive & analysis
         </span>
       </div>
 
@@ -261,19 +271,24 @@ export function WeatherDetails() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: idx * 0.04 }}
-              className="glass-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between border border-white/5 hover:border-white/15 transition-all group"
+              onClick={() => openDeepDive(card.deepDiveKey)}
+              className="glass-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between border border-white/5 hover:border-sky-400/40 hover:bg-white/[0.08] transition-all group cursor-pointer"
+              title={`Tap for 24h ${card.title} deep dive`}
             >
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center text-slate-300 group-hover:text-sky-400 group-hover:bg-sky-500/10 transition-colors">
                     <IconComp className="w-4 h-4" />
                   </div>
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${card.badgeColor}`}>
-                    {card.badge}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${card.badgeColor}`}>
+                      {card.badge}
+                    </span>
+                    <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-sky-400 group-hover:translate-x-0.5 transition-all" />
+                  </div>
                 </div>
 
-                <div className="text-xs font-medium text-slate-400">
+                <div className="text-xs font-medium text-slate-400 group-hover:text-slate-300 transition-colors">
                   {card.title}
                 </div>
                 <div className="text-xl sm:text-2xl font-bold text-white tracking-tight mt-1">

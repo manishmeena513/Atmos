@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useWeatherStore } from './store/weatherStore';
+import { applyTheme } from './utils/themeEngine';
 import { Header } from './components/layout/Header';
 import { Navigation } from './components/layout/Navigation';
 import { SectionWrapper } from './components/layout/SectionWrapper';
@@ -24,6 +25,14 @@ import { ShareWeatherModal } from './components/share/ShareWeatherModal';
 import { LoadingAtmosphere } from './components/states/LoadingAtmosphere';
 import { ErrorState } from './components/states/ErrorState';
 
+// V2.5 Living Weather & Personalization Modals
+import { AtmosStudioModal } from './components/studio/AtmosStudioModal';
+import { MetricDeepDiveModal } from './components/deepdive/MetricDeepDiveModal';
+import { PlanYourDayModal } from './components/planning/PlanYourDayModal';
+import { TravelModeModal } from './components/travel/TravelModeModal';
+import { WeatherMemoriesModal } from './components/memories/WeatherMemoriesModal';
+import { OfflineBanner } from './components/pwa/OfflineBanner';
+
 export function App() {
   const location = useWeatherStore((s) => s.location);
   const loading = useWeatherStore((s) => s.loading);
@@ -31,18 +40,160 @@ export function App() {
   const weather = useWeatherStore((s) => s.weather);
   const fetchData = useWeatherStore((s) => s.fetchData);
 
+  // V2.5 Personalization State
+  const theme = useWeatherStore((s) => s.theme);
+  const glass = useWeatherStore((s) => s.glass);
+  const typography = useWeatherStore((s) => s.typography);
+  const performance = useWeatherStore((s) => s.performance);
+  const dashboard = useWeatherStore((s) => s.dashboard);
+
+  // Deep-dive state
+  const isDeepDiveOpen = useWeatherStore((s) => s.isDeepDiveOpen);
+  const closeDeepDive = useWeatherStore((s) => s.closeDeepDive);
+
+  // Modal Open States
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isImmersiveOpen, setIsImmersiveOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isStudioOpen, setIsStudioOpen] = useState(false);
+  const [isPlanOpen, setIsPlanOpen] = useState(false);
+  const [isTravelOpen, setIsTravelOpen] = useState(false);
+  const [isMemoriesOpen, setIsMemoriesOpen] = useState(false);
 
   // Initial weather fetch on mount
   useEffect(() => {
     fetchData(location.lat, location.lon);
   }, []);
 
+  // Synchronize CSS custom properties & theme engine
+  useEffect(() => {
+    let activePreset = theme?.preset || 'classic';
+
+    // Auto Adapt based on celestial hour & conditions
+    if (theme?.autoAdapt && weather?.current) {
+      const isDay = weather.current.is_day;
+      const hour = new Date().getHours();
+      if (!isDay && (hour < 5 || hour >= 21)) {
+        activePreset = 'midnight';
+      } else if ((hour >= 5 && hour < 8) || (hour >= 18 && hour < 21)) {
+        activePreset = 'sunset';
+      } else {
+        activePreset = 'weather-reactive';
+      }
+    }
+
+    applyTheme(
+      { ...(theme || {}), preset: activePreset },
+      glass || {},
+      typography || {},
+      performance || {},
+      weather?.current?.weather_code,
+      weather?.current?.is_day
+    );
+  }, [theme, glass, typography, performance, weather]);
+
+  // Section Component Registry
+  const renderSection = (id) => {
+    switch (id) {
+      case 'timeline':
+        return (
+          <SectionWrapper key="timeline" id="timeline-section">
+            <TodayTimeline />
+          </SectionWrapper>
+        );
+      case 'hourly':
+        return (
+          <SectionWrapper key="hourly" id="hourly-section">
+            <HourlyForecast />
+          </SectionWrapper>
+        );
+      case 'intelligence':
+        return (
+          <SectionWrapper key="intelligence" id="intelligence-section">
+            <DayIntelligenceGrid />
+          </SectionWrapper>
+        );
+      case 'insights':
+        return (
+          <SectionWrapper key="insights" id="insights-section">
+            <WeatherInsights />
+          </SectionWrapper>
+        );
+      case 'activity':
+        return (
+          <SectionWrapper key="activity" id="activity-section">
+            <ActivityMode />
+          </SectionWrapper>
+        );
+      case 'forecast':
+        return (
+          <SectionWrapper key="forecast" id="forecast-section">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="lg:col-span-7">
+                <SevenDayForecast />
+              </div>
+              <div className="lg:col-span-5">
+                <TemperatureChart />
+              </div>
+            </div>
+          </SectionWrapper>
+        );
+      case 'details':
+        return (
+          <SectionWrapper key="details" id="details-section">
+            <WeatherDetails />
+          </SectionWrapper>
+        );
+      case 'airquality':
+        return (
+          <SectionWrapper key="airquality" id="airquality-section">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              <div className="lg:col-span-7">
+                <AirQualitySection />
+              </div>
+              <div className="lg:col-span-5">
+                <SunMoonArc />
+              </div>
+            </div>
+          </SectionWrapper>
+        );
+      case 'compare':
+        return (
+          <SectionWrapper key="compare" id="compare-section">
+            <CityComparison />
+          </SectionWrapper>
+        );
+      default:
+        return null;
+    }
+  };
+
+  // Section density spacing class
+  const densityClass =
+    dashboard?.density === 'compact'
+      ? 'space-y-4 my-3'
+      : dashboard?.density === 'spacious'
+      ? 'space-y-12 my-8'
+      : 'space-y-8 my-4';
+
+  const orderedSections = dashboard?.sections || [
+    { id: 'timeline', visible: true },
+    { id: 'hourly', visible: true },
+    { id: 'intelligence', visible: true },
+    { id: 'insights', visible: true },
+    { id: 'activity', visible: true },
+    { id: 'forecast', visible: true },
+    { id: 'details', visible: true },
+    { id: 'airquality', visible: true },
+    { id: 'compare', visible: true },
+  ];
+
   return (
-    <div className="relative min-h-screen bg-[#080B10] text-slate-100 font-sans selection:bg-sky-500/30 selection:text-sky-200">
+    <div className="relative min-h-screen bg-[var(--bg-primary,#080B10)] text-slate-100 font-sans selection:bg-sky-500/30 selection:text-sky-200">
+      {/* PWA & Offline Status Banner */}
+      <OfflineBanner />
+
       {/* Optional Frosted Glass Window Overlay Mode */}
       <GlassOverlay />
 
@@ -57,6 +208,10 @@ export function App() {
         onOpenSearch={() => setIsSearchOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onEnterImmersive={() => setIsImmersiveOpen(true)}
+        onOpenStudio={() => setIsStudioOpen(true)}
+        onOpenTravel={() => setIsTravelOpen(true)}
+        onOpenPlan={() => setIsPlanOpen(true)}
+        onOpenMemories={() => setIsMemoriesOpen(true)}
       />
 
       {/* Initial Loading Screen */}
@@ -85,71 +240,19 @@ export function App() {
             <FavoritesCities onOpenSearch={() => setIsSearchOpen(true)} />
           </div>
 
-          {/* 2. Weather Time Machine / Today's Timeline */}
-          <SectionWrapper id="timeline-section">
-            <TodayTimeline />
-          </SectionWrapper>
-
-          {/* 3. Hourly Weather Timeline */}
-          <SectionWrapper id="hourly-section">
-            <HourlyForecast />
-          </SectionWrapper>
-
-          {/* 4. Day Intelligence Grid: Rain Intelligence, What Should I Wear?, Atmos Comfort */}
-          <SectionWrapper id="intelligence-section">
-            <DayIntelligenceGrid />
-          </SectionWrapper>
-
-          {/* 5. Weather Insights, Weather Trends & Weather Changes */}
-          <SectionWrapper id="insights-section">
-            <WeatherInsights />
-          </SectionWrapper>
-
-          {/* 6. "Should I Go Out?" Activity Section */}
-          <SectionWrapper id="activity-section">
-            <ActivityMode />
-          </SectionWrapper>
-
-          {/* 7. Advanced 7-Day Forecast & 24-Hour Temperature Curve */}
-          <SectionWrapper id="forecast-section">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-7">
-                <SevenDayForecast />
-              </div>
-              <div className="lg:col-span-5">
-                <TemperatureChart />
-              </div>
-            </div>
-          </SectionWrapper>
-
-          {/* 8. Detailed Atmospheric Telemetry */}
-          <SectionWrapper id="details-section">
-            <WeatherDetails />
-          </SectionWrapper>
-
-          {/* 9. Air Quality & Daylight Progression (Sunrise/Sunset) */}
-          <SectionWrapper id="airquality-section">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              <div className="lg:col-span-7">
-                <AirQualitySection />
-              </div>
-              <div className="lg:col-span-5">
-                <SunMoonArc />
-              </div>
-            </div>
-          </SectionWrapper>
-
-          {/* 10. Multi-City Comparison Matrix */}
-          <SectionWrapper id="compare-section">
-            <CityComparison />
-          </SectionWrapper>
+          {/* Dynamic Reorderable Dashboard Sections */}
+          <div className={densityClass}>
+            {orderedSections
+              .filter((s) => s.visible !== false)
+              .map((s) => renderSection(s.id))}
+          </div>
 
           {/* Atmospheric Footer */}
           <footer className="max-w-7xl mx-auto px-4 sm:px-8 py-16 text-center text-xs text-slate-500 border-t border-white/5 mt-12 space-y-3">
             <div className="flex items-center justify-center gap-2 text-slate-400 font-semibold tracking-wider uppercase text-[11px]">
               <span>Atmos</span>
               <span>·</span>
-              <span>Weather Intelligence Experience</span>
+              <span>Living Weather Experience V2.5</span>
             </div>
             <p className="text-slate-400 italic">
               &ldquo;Don&apos;t just show the weather. Explain the day.&rdquo;
@@ -157,33 +260,47 @@ export function App() {
             <p>
               Telemetry delivered via Open-Meteo High-Resolution Atmospheric Models.
             </p>
-            <div className="flex items-center justify-center gap-4 text-slate-500 pt-2">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-slate-500 pt-2 text-xs">
+              <button
+                onClick={() => setIsStudioOpen(true)}
+                className="hover:text-sky-400 font-medium transition-colors cursor-pointer"
+              >
+                Atmos Studio
+              </button>
+              <span>·</span>
+              <button
+                onClick={() => setIsPlanOpen(true)}
+                className="hover:text-emerald-400 font-medium transition-colors cursor-pointer"
+              >
+                Plan Day
+              </button>
+              <span>·</span>
+              <button
+                onClick={() => setIsTravelOpen(true)}
+                className="hover:text-sky-400 font-medium transition-colors cursor-pointer"
+              >
+                Travel Mode
+              </button>
+              <span>·</span>
+              <button
+                onClick={() => setIsMemoriesOpen(true)}
+                className="hover:text-amber-400 font-medium transition-colors cursor-pointer"
+              >
+                Weather Memories
+              </button>
+              <span>·</span>
+              <button
+                onClick={() => setIsShareOpen(true)}
+                className="hover:text-sky-400 font-medium transition-colors cursor-pointer"
+              >
+                Share Card
+              </button>
+              <span>·</span>
               <button
                 onClick={() => setIsSettingsOpen(true)}
                 className="hover:text-slate-300 transition-colors cursor-pointer"
               >
                 Preferences
-              </button>
-              <span>·</span>
-              <button
-                onClick={() => setIsSearchOpen(true)}
-                className="hover:text-slate-300 transition-colors cursor-pointer"
-              >
-                Change Location
-              </button>
-              <span>·</span>
-              <button
-                onClick={() => setIsShareOpen(true)}
-                className="hover:text-sky-400 transition-colors cursor-pointer"
-              >
-                Share Weather
-              </button>
-              <span>·</span>
-              <button
-                onClick={() => setIsImmersiveOpen(true)}
-                className="hover:text-sky-400 transition-colors cursor-pointer"
-              >
-                Enter Weather
               </button>
             </div>
             <div className="pt-6 border-t border-white/5 space-y-1 text-slate-500 text-[11px]">
@@ -209,7 +326,38 @@ export function App() {
         isOpen={isShareOpen}
         onClose={() => setIsShareOpen(false)}
       />
+
+      {/* V2.5 Atmos Studio Master Customization Drawer */}
+      <AtmosStudioModal
+        isOpen={isStudioOpen}
+        onClose={() => setIsStudioOpen(false)}
+      />
+
+      {/* V2.5 Metric Deep-Dive Modal */}
+      <MetricDeepDiveModal
+        isOpen={isDeepDiveOpen}
+        onClose={closeDeepDive}
+      />
+
+      {/* V2.5 Plan Your Day Window Evaluator */}
+      <PlanYourDayModal
+        isOpen={isPlanOpen}
+        onClose={() => setIsPlanOpen(false)}
+      />
+
+      {/* V2.5 Travel Mode Destination Preview */}
+      <TravelModeModal
+        isOpen={isTravelOpen}
+        onClose={() => setIsTravelOpen(false)}
+      />
+
+      {/* V2.5 Weather Memories Local Journal */}
+      <WeatherMemoriesModal
+        isOpen={isMemoriesOpen}
+        onClose={() => setIsMemoriesOpen(false)}
+      />
     </div>
   );
 }
+
 export default App;

@@ -104,7 +104,7 @@ export function WeatherEnvironment({ className = '', isImmersive = false }) {
       {enableParticles && <LightningLayer theme={theme} />}
 
       {/* 8. Horizon Vignette & Atmospheric Depth Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#080B10] via-transparent to-black/25 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#080B10]/80 via-transparent to-black/20 pointer-events-none" />
     </div>
   );
 }

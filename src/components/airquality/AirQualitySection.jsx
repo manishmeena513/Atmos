@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, ShieldCheck, AlertCircle, Info } from 'lucide-react';
+import { Activity, ShieldCheck, AlertCircle, Info, ChevronRight } from 'lucide-react';
 import { useWeatherStore } from '../../store/weatherStore';
 
 function getAqiCategory(aqi) {
@@ -45,6 +45,7 @@ function getAqiCategory(aqi) {
 
 export function AirQualitySection() {
   const airQuality = useWeatherStore((s) => s.airQuality);
+  const openDeepDive = useWeatherStore((s) => s.openDeepDive);
 
   const curr = airQuality?.current;
   const rawAqi = curr?.european_aqi ?? curr?.us_aqi ?? null;
@@ -162,16 +163,24 @@ export function AirQualitySection() {
               Atmospheric Air Quality
             </h3>
           </div>
-          <span className="text-[11px] text-slate-400 font-mono">
-            European AQI Scale
-          </span>
+          <button
+            onClick={() => openDeepDive('aqi')}
+            className="text-[11px] text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-mono transition-colors cursor-pointer"
+          >
+            <span>EAQI Scale</span>
+            <ChevronRight className="w-3 h-3" />
+          </button>
         </div>
 
-        {/* AQI Score Dial / Banner */}
-        <div className="flex items-center gap-5 p-4 rounded-2xl bg-white/[0.02] border border-white/5 mb-4">
+        {/* AQI Score Dial / Banner - Tap to open deep dive */}
+        <div
+          onClick={() => openDeepDive('aqi')}
+          className="flex items-center gap-5 p-4 rounded-2xl bg-white/[0.02] border border-white/5 mb-4 hover:border-emerald-500/30 hover:bg-white/[0.04] transition-all cursor-pointer group"
+          title="Tap for AQI deep dive and pollutant analysis"
+        >
           {/* Circular Badge */}
           <div
-            className="w-16 h-16 rounded-2xl flex flex-col items-center justify-center shrink-0 border"
+            className="w-16 h-16 rounded-2xl flex flex-col items-center justify-center shrink-0 border group-hover:scale-105 transition-transform"
             style={{
               backgroundColor: aqiInfo.bgColor,
               borderColor: aqiInfo.color,
@@ -187,7 +196,9 @@ export function AirQualitySection() {
 
           <div>
             <div className="flex items-center gap-2">
-              <h4 className="text-lg font-bold text-white">{aqiInfo.label} Air</h4>
+              <h4 className="text-lg font-bold text-white group-hover:text-emerald-300 transition-colors">
+                {aqiInfo.label} Air
+              </h4>
               <ShieldCheck className="w-4 h-4" style={{ color: aqiInfo.color }} />
             </div>
             <p className="text-xs text-slate-300 mt-1 leading-relaxed">
