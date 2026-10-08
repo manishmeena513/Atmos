@@ -34,7 +34,7 @@ export function SettingsPanel({ isOpen, onClose, onOpenStudio }) {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '100%', opacity: 0 }}
               transition={{ type: 'spring', damping: 30, stiffness: 320 }}
-              className="pointer-events-auto w-full sm:w-[420px] max-h-[90vh] sm:max-h-full bg-[#0c1322] border-t sm:border-t-0 sm:border-l border-white/10 shadow-2xl rounded-t-[28px] sm:rounded-none p-5 sm:p-6 overflow-y-auto flex flex-col justify-between"
+              className="pointer-events-auto w-full sm:w-[420px] max-h-[90vh] sm:max-h-full glass-surface-modal border-t sm:border-t-0 sm:border-l border-white/10 shadow-2xl rounded-t-[28px] sm:rounded-none p-5 sm:p-6 overflow-y-auto flex flex-col justify-between"
             >
               <div>
                 {/* Mobile Drag Handle */}
@@ -195,7 +195,7 @@ export function SettingsPanel({ isOpen, onClose, onOpenStudio }) {
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Version</span>
-                  <span className="text-slate-400 font-mono">Atmos V2.5</span>
+                  <span className="text-slate-400 font-mono">Atmos V3.1</span>
                 </div>
                 <div className="text-center pt-2 text-slate-600">
                   Developed by Manish Meena

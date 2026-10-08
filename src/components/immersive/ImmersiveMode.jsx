@@ -117,7 +117,7 @@ export function ImmersiveMode({ isOpen, onClose }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed inset-0 z-50 overflow-hidden bg-[#04070D] select-none"
+        className="fixed inset-0 z-50 overflow-hidden bg-[var(--atmos-bg,#000000)] select-none"
       >
         {/* Living Weather Environment (Deepened with isImmersive flag) */}
         <div className="absolute inset-0 z-0 scale-105 filter brightness-110">

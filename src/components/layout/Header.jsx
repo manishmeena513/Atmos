@@ -198,7 +198,7 @@ export function Header({
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: '100%', opacity: 0 }}
                 transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-                className="pointer-events-auto w-full sm:w-[420px] max-h-[88vh] sm:max-h-full bg-[#0a1120] border-t sm:border-t-0 sm:border-l border-white/15 shadow-2xl rounded-t-[28px] sm:rounded-none p-5 sm:p-6 overflow-y-auto flex flex-col justify-between"
+                className="pointer-events-auto w-full sm:w-[420px] max-h-[88vh] sm:max-h-full glass-surface-modal border-t sm:border-t-0 sm:border-l border-white/15 shadow-2xl rounded-t-[28px] sm:rounded-none p-5 sm:p-6 overflow-y-auto flex flex-col justify-between"
               >
                 <div>
                   {/* Mobile Drag Pill */}
@@ -319,7 +319,7 @@ export function Header({
 
                 {/* Footer Attribution */}
                 <div className="pt-4 border-t border-white/10 text-center text-[11px] text-slate-500">
-                  <span>Atmos V2.5 · Developed by Manish Meena</span>
+                  <span>Atmos V3.1 · Developed by Manish Meena</span>
                 </div>
               </motion.div>
             </div>

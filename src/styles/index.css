@@ -38,6 +38,10 @@
     transition: background-color 0.4s ease, color 0.3s ease;
   }
 
+  html, body, button, input, select, textarea, .font-sans {
+    font-family: var(--atmos-font-family) !important;
+  }
+
   #root {
     width: 100%;
     min-height: 100vh;
@@ -51,7 +55,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(8, 11, 16, 0.6);
+  background: var(--atmos-bg);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -63,12 +67,32 @@
   background: rgba(255, 255, 255, 0.24);
 }
 
-/* Authentic Multi-Layer Liquid Glass System */
+/* Authentic Multi-Layer Physical Liquid Glass System */
+
+/* 1. Hero Atmospheric Layer */
+.glass-surface-hero {
+  background: var(--atmos-surface-hero, rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(var(--atmos-glass-blur, 20px)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--atmos-glass-blur, 20px)) saturate(140%);
+  border: 1px solid var(--atmos-border, rgba(255, 255, 255, 0.14));
+  box-shadow: var(--atmos-glass-shadow, 0 8px 32px 0 rgba(0, 0, 0, 0.32)),
+              inset 0 1px 0 0 var(--atmos-glass-specular, rgba(255, 255, 255, 0.16)),
+              inset 0 -1px 0 0 rgba(0, 0, 0, 0.1);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 2. Standard Content Cards (and legacy .glass-panel) */
+.glass-surface-card,
 .glass-panel {
-  background: var(--atmos-surface);
-  backdrop-filter: blur(var(--atmos-glass-blur)) saturate(140%);
-  -webkit-backdrop-filter: blur(var(--atmos-glass-blur)) saturate(140%);
-  border: 1px solid var(--atmos-border);
+  background: var(--atmos-surface, rgba(255, 255, 255, 0.08));
+  backdrop-filter: blur(var(--atmos-glass-blur, 20px)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--atmos-glass-blur, 20px)) saturate(140%);
+  border: 1px solid var(--atmos-border, rgba(255, 255, 255, 0.16));
   box-shadow: var(--atmos-glass-shadow, 0 8px 32px 0 rgba(0, 0, 0, 0.32)),
               inset 0 1px 0 0 var(--atmos-glass-specular, rgba(255, 255, 255, 0.16)),
               inset 0 -1px 0 0 rgba(0, 0, 0, 0.12);
@@ -95,17 +119,51 @@
               inset 0 1px 0 0 rgba(255, 255, 255, 0.24);
 }
 
+/* 3. Small Interactive Controls & Badges (and legacy .glass-pill) */
+.glass-surface-pill,
 .glass-pill {
-  background: var(--atmos-surface);
-  backdrop-filter: blur(calc(var(--atmos-glass-blur) * 0.75)) saturate(135%);
-  -webkit-backdrop-filter: blur(calc(var(--atmos-glass-blur) * 0.75)) saturate(135%);
-  border: 1px solid var(--atmos-border);
+  background: var(--atmos-surface-pill, rgba(255, 255, 255, 0.10));
+  backdrop-filter: blur(calc(var(--atmos-glass-blur, 20px) * 0.75)) saturate(135%);
+  -webkit-backdrop-filter: blur(calc(var(--atmos-glass-blur, 20px) * 0.75)) saturate(135%);
+  border: 1px solid var(--atmos-border, rgba(255, 255, 255, 0.16));
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22),
               inset 0 1px 0 0 var(--atmos-glass-specular, rgba(255, 255, 255, 0.14));
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   transform: translateZ(0);
   transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* 4. Navigation & Floating Action Bars */
+.glass-surface-nav {
+  background: var(--atmos-surface-nav, rgba(255, 255, 255, 0.12));
+  backdrop-filter: blur(calc(var(--atmos-glass-blur, 20px) * 1.2)) saturate(150%);
+  -webkit-backdrop-filter: blur(calc(var(--atmos-glass-blur, 20px) * 1.2)) saturate(150%);
+  border: 1px solid var(--atmos-border, rgba(255, 255, 255, 0.18));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35),
+              inset 0 1px 0 0 var(--atmos-glass-specular, rgba(255, 255, 255, 0.2));
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 5. Modals, Drawers & Deep Sheets */
+.glass-surface-modal {
+  background: var(--atmos-surface-modal, rgba(15, 23, 42, 0.88));
+  backdrop-filter: blur(calc(var(--atmos-glass-blur, 20px) * 1.5)) saturate(160%);
+  -webkit-backdrop-filter: blur(calc(var(--atmos-glass-blur, 20px) * 1.5)) saturate(160%);
+  border: 1px solid var(--atmos-border, rgba(255, 255, 255, 0.22));
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7),
+              inset 0 1px 0 0 var(--atmos-glass-specular, rgba(255, 255, 255, 0.25));
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Density Modifiers */
@@ -120,7 +178,8 @@
 }
 
 /* Enhanced Glass Mode (Toggled ON via Settings) */
-.glass-mode-active .glass-panel {
+.glass-mode-active .glass-panel,
+.glass-mode-active .glass-surface-card {
   background: rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(28px) saturate(150%);
   -webkit-backdrop-filter: blur(28px) saturate(150%);
@@ -129,7 +188,8 @@
               inset 0 1px 1px 0 rgba(255, 255, 255, 0.25);
 }
 
-.glass-mode-active .glass-pill {
+.glass-mode-active .glass-pill,
+.glass-mode-active .glass-surface-pill {
   background: rgba(255, 255, 255, 0.11);
   backdrop-filter: blur(20px) saturate(150%);
   -webkit-backdrop-filter: blur(20px) saturate(150%);
@@ -138,14 +198,28 @@
 
 /* Graceful Fallback for browsers/devices without backdrop-filter */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass-surface-hero {
+    background: #090f1d;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .glass-surface-card,
   .glass-panel {
     background: #0d1527;
     border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   }
+  .glass-surface-pill,
   .glass-pill {
     background: #111a30;
     border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .glass-surface-nav {
+    background: #0d1527;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .glass-surface-modal {
+    background: #0b1120;
+    border: 1px solid rgba(255, 255, 255, 0.2);
   }
   .glass-mode-active .glass-panel {
     background: #121c33;

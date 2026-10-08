@@ -398,7 +398,7 @@ export function ShareWeatherModal({ isOpen, onClose }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.94, y: 20 }}
             transition={{ type: 'spring', stiffness: 360, damping: 28 }}
-            className="relative z-10 w-full max-w-xl bg-[#0b1220] border border-white/15 rounded-3xl p-5 sm:p-6 shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col"
+            className="relative z-10 w-full max-w-xl glass-surface-modal border border-white/15 rounded-3xl p-5 sm:p-6 shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col"
           >
             {/* Modal Top Bar */}
             <div className="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
@@ -408,7 +408,7 @@ export function ShareWeatherModal({ isOpen, onClose }) {
                   <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
                     Share Studio
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 font-semibold border border-sky-500/30">
-                      V2.5
+                      V3.1
                     </span>
                   </h3>
                   <p className="text-xs text-slate-400">Export high-resolution weather cards</p>

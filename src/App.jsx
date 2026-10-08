@@ -5,6 +5,7 @@ import { Header } from './components/layout/Header';
 import { Navigation } from './components/layout/Navigation';
 import { SectionWrapper } from './components/layout/SectionWrapper';
 import { HeroSection } from './components/hero/HeroSection';
+import { DailyBrief } from './components/hero/DailyBrief';
 import { WeatherEnvironment } from './components/environment/WeatherEnvironment';
 import { TodayTimeline } from './components/timeline/TodayTimeline';
 import { HourlyForecast } from './components/hourly/HourlyForecast';
@@ -79,6 +80,21 @@ export function App() {
   // Section Component Registry
   const renderSection = (id) => {
     switch (id) {
+      case 'hero':
+        return (
+          <div key="hero" id="hero-section">
+            <HeroSection
+              onEnterImmersive={() => setIsImmersiveOpen(true)}
+              onOpenShare={() => setIsShareOpen(true)}
+            />
+          </div>
+        );
+      case 'dailybrief':
+        return (
+          <SectionWrapper key="dailybrief" id="dailybrief-section">
+            <DailyBrief />
+          </SectionWrapper>
+        );
       case 'timeline':
         return (
           <SectionWrapper key="timeline" id="timeline-section">
@@ -160,7 +176,9 @@ export function App() {
       ? 'space-y-12 my-8'
       : 'space-y-8 my-4';
 
-  const orderedSections = dashboard?.sections || [
+  const rawSections = dashboard?.sections || [
+    { id: 'hero', visible: true },
+    { id: 'dailybrief', visible: true },
     { id: 'hourly', visible: true },
     { id: 'intelligence', visible: true },
     { id: 'forecast', visible: true },
@@ -171,6 +189,18 @@ export function App() {
     { id: 'activity', visible: false },
     { id: 'compare', visible: false },
   ];
+
+  const sectionIds = new Set(rawSections.map((s) => s.id));
+  let completeSections = [...rawSections];
+  if (!sectionIds.has('hero')) {
+    completeSections.unshift({ id: 'hero', name: 'Current Weather & Location', visible: true });
+  }
+  if (!sectionIds.has('dailybrief')) {
+    const heroIdx = completeSections.findIndex((s) => s.id === 'hero');
+    completeSections.splice(heroIdx + 1, 0, { id: 'dailybrief', name: 'Atmos Daily Brief Strip', visible: true });
+  }
+
+  const visibleSections = completeSections.filter((s) => s.visible !== false);
 
   return (
     <div className="relative min-h-screen text-slate-100 font-sans selection:bg-sky-500/30 selection:text-sky-200">
@@ -213,27 +243,28 @@ export function App() {
         </main>
       ) : (
         <main className="relative z-10">
-          {/* 1. Hero Atmospheric Living Stage + Atmos Daily Brief */}
-          <div id="hero-section">
-            <HeroSection
-              onEnterImmersive={() => setIsImmersiveOpen(true)}
-              onOpenShare={() => setIsShareOpen(true)}
-            />
-          </div>
-
-          {/* Sticky Navigation Bar */}
-          <Navigation />
-
-          {/* Favorites & Saved Cities Quick Bar */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-8 mt-2">
-            <FavoritesCities onOpenSearch={() => setIsSearchOpen(true)} />
-          </div>
-
           {/* Dynamic Reorderable Dashboard Sections */}
           <div className={densityClass}>
-            {orderedSections
-              .filter((s) => s.id !== 'hero' && s.visible !== false)
-              .map((s) => renderSection(s.id))}
+            {visibleSections.map((s, idx) => {
+              const isFirst = idx === 0;
+              const heroIsFirst = visibleSections[0]?.id === 'hero';
+
+              return (
+                <React.Fragment key={s.id}>
+                  {renderSection(s.id)}
+
+                  {/* Navigation and Quick Bar: mounted after hero if hero is first, or at top if hero is moved/hidden */}
+                  {((heroIsFirst && s.id === 'hero') || (!heroIsFirst && isFirst)) && (
+                    <div key="global-nav-strip" className="my-2 space-y-2">
+                      <Navigation />
+                      <div className="max-w-7xl mx-auto px-4 sm:px-8">
+                        <FavoritesCities onOpenSearch={() => setIsSearchOpen(true)} />
+                      </div>
+                    </div>
+                  )}
+                </React.Fragment>
+              );
+            })}
           </div>
 
           {/* Atmospheric Footer */}
@@ -241,7 +272,7 @@ export function App() {
             <div className="flex items-center justify-center gap-2 text-slate-400 font-semibold tracking-wider uppercase text-[11px]">
               <span>Atmos</span>
               <span>·</span>
-              <span>Living Weather Experience V2.5</span>
+              <span>Living Weather Experience V3.1</span>
             </div>
             <p className="text-slate-400 italic">
               &ldquo;Don&apos;t just show the weather. Explain the day.&rdquo;

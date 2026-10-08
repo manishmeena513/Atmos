@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Loader2 } from 'lucide-react';
 import { useWeatherStore } from '../../store/weatherStore';
 import { WeatherInfo } from './WeatherInfo';
-import { DailyBrief } from './DailyBrief';
 
 export function HeroSection({ onEnterImmersive, onOpenShare }) {
   const weather = useWeatherStore((s) => s.weather);
@@ -43,7 +42,7 @@ export function HeroSection({ onEnterImmersive, onOpenShare }) {
   };
 
   return (
-    <section className="relative w-full min-h-[92svh] sm:min-h-[96svh] flex flex-col justify-between overflow-hidden px-3.5 sm:px-8 lg:px-14 pt-16 sm:pt-24 pb-4 sm:pb-8">
+    <section className="relative w-full min-h-[70svh] sm:min-h-[78svh] flex flex-col justify-between overflow-hidden px-3.5 sm:px-8 lg:px-14 pt-16 sm:pt-24 pb-4 sm:pb-8">
       {/* Subtle indicator ONLY when time-travel scrubbing or transitioning */}
       <div className="relative z-10 max-w-7xl w-full mx-auto flex items-center justify-between min-h-[24px]">
         {selectedHour !== null ? (
@@ -68,7 +67,7 @@ export function HeroSection({ onEnterImmersive, onOpenShare }) {
         </AnimatePresence>
       </div>
 
-      {/* 2. Hero Main Stage: Current Weather, Meaning, Metrics & Daily Brief */}
+      {/* 2. Hero Main Stage: Current Weather, Meaning & Essential Metrics */}
       <motion.div
         key={`${location.lat}-${location.lon}`}
         initial={{ opacity: 0.65, y: 8 }}
@@ -83,9 +82,6 @@ export function HeroSection({ onEnterImmersive, onOpenShare }) {
           timezone={weather.timezone}
           onOpenShare={onOpenShare}
         />
-
-        {/* 4-Part Atmos Daily Brief Strip */}
-        <DailyBrief />
       </motion.div>
 
       {/* 3. Bottom Minimal Scroll Cue */}

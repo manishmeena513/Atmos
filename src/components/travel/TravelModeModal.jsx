@@ -111,7 +111,7 @@ export function TravelModeModal() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: '100%', opacity: 0 }}
           transition={{ type: 'spring', damping: 28, stiffness: 320 }}
-          className="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto bg-[#0b1220] border-t sm:border border-white/15 rounded-t-[28px] sm:rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col justify-between"
+          className="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto glass-surface-modal border-t sm:border border-white/15 rounded-t-[28px] sm:rounded-3xl p-5 sm:p-6 shadow-2xl flex flex-col justify-between"
         >
           {/* Mobile Handle */}
           <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-3 sm:hidden" />

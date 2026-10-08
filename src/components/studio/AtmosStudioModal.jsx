@@ -115,7 +115,7 @@ export function AtmosStudioModal() {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: '100%', opacity: 0 }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="relative z-10 w-full sm:w-[500px] h-[92vh] sm:h-full bg-[#090d16] border-t sm:border-t-0 sm:border-l border-white/15 rounded-t-[32px] sm:rounded-none shadow-2xl flex flex-col justify-between overflow-hidden"
+          className="relative z-10 w-full sm:w-[500px] h-[92vh] sm:h-full glass-surface-modal border-t sm:border-t-0 sm:border-l border-white/15 rounded-t-[32px] sm:rounded-none shadow-2xl flex flex-col justify-between overflow-hidden"
         >
           {/* Top Title Bar */}
           <div className="p-5 sm:p-6 pb-3 border-b border-white/10 shrink-0">
@@ -872,8 +872,8 @@ export function AtmosStudioModal() {
           </div>
 
           {/* Bottom Action Footer */}
-          <div className="p-4 sm:p-5 border-t border-white/10 bg-[#070b13] flex items-center justify-between text-xs text-slate-500">
-            <span>Atmos V2.5 · Living Experience</span>
+          <div className="p-4 sm:p-5 border-t border-white/10 bg-black/30 backdrop-blur-md flex items-center justify-between text-xs text-slate-400">
+            <span>Atmos V3.1 · Living Experience</span>
             <button
               onClick={closeStudio}
               className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs transition-colors cursor-pointer"

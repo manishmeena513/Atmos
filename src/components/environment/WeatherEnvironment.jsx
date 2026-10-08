@@ -10,12 +10,17 @@ import { FogLayer } from './FogLayer';
 import { LightningLayer } from './LightningLayer';
 
 export function WeatherEnvironment({ className = '', isImmersive = false }) {
-  const getCurrentTheme = useWeatherStore((s) => s.getCurrentTheme);
   const weather = useWeatherStore((s) => s.weather);
+  const selectedHour = useWeatherStore((s) => s.selectedHour);
+  const themePreset = useWeatherStore((s) => s.themePreset);
+  const themeMode = useWeatherStore((s) => s.themeMode);
+  const customColors = useWeatherStore((s) => s.customColors);
+  const effects = useWeatherStore((s) => s.effects);
   const animationIntensity = useWeatherStore((s) => s.animationIntensity);
   const reducedMotion = useWeatherStore((s) => s.reducedMotion);
+  const getCurrentEnvironment = useWeatherStore((s) => s.getCurrentEnvironment);
 
-  const theme = getCurrentTheme();
+  const theme = getCurrentEnvironment();
   const windSpeed = weather?.current?.wind_speed_10m || 12;
   const windDirection = weather?.current?.wind_direction_10m || 180;
 
@@ -104,7 +109,12 @@ export function WeatherEnvironment({ className = '', isImmersive = false }) {
       {enableParticles && <LightningLayer theme={theme} />}
 
       {/* 8. Horizon Vignette & Atmospheric Depth Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#080B10]/80 via-transparent to-black/20 pointer-events-none" />
+      <div
+        className="absolute inset-0 pointer-events-none transition-colors duration-700"
+        style={{
+          background: `linear-gradient(to top, color-mix(in srgb, ${theme.bg} 85%, transparent) 0%, transparent 40%, rgba(0, 0, 0, 0.2) 100%)`,
+        }}
+      />
     </div>
   );
 }

@@ -121,7 +121,7 @@ export function SearchModal({ isOpen, onClose }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 60 }}
             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-            className="relative w-full max-w-xl bg-[#0d1422] border border-white/15 shadow-2xl rounded-t-[28px] sm:rounded-3xl p-5 sm:p-6 z-10 max-h-[88vh] flex flex-col overflow-hidden"
+            className="relative w-full max-w-xl glass-surface-modal border border-white/15 shadow-2xl rounded-t-[28px] sm:rounded-3xl p-5 sm:p-6 z-10 max-h-[88vh] flex flex-col overflow-hidden"
           >
             {/* Mobile Drag Handle Bar */}
             <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-3 sm:hidden" />

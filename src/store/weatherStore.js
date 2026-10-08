@@ -2,7 +2,11 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { fetchWeather, fetchAirQuality } from '../api/openmeteo.js';
 import { getAtmosphereTheme } from '../utils/weatherTheme.js';
-import { applyThemeToDOM, THEME_PRESETS } from '../utils/themeEngine.js';
+import {
+  applyThemeToDOM,
+  calculateAtmosEnvironment,
+  THEME_PRESETS,
+} from '../utils/themeEngine.js';
 
 const DEFAULT_LOCATION = {
   name: 'Meerut',
@@ -14,7 +18,8 @@ const DEFAULT_LOCATION = {
 };
 
 const DEFAULT_DASHBOARD_SECTIONS = [
-  { id: 'hero', name: 'Current Weather & Brief', visible: true },
+  { id: 'hero', name: 'Current Weather & Location', visible: true },
+  { id: 'dailybrief', name: 'Atmos Daily Brief Strip', visible: true },
   { id: 'hourly', name: 'Hourly Forecast', visible: true },
   { id: 'intelligence', name: 'Day Guide (Rain, Wear, Comfort)', visible: true },
   { id: 'forecast', name: '7-Day Forecast & Curve', visible: true },
@@ -160,6 +165,7 @@ export const useWeatherStore = create(
 
       setSelectedHour: (hour) => {
         set({ selectedHour: hour });
+        get().applyCurrentTheme();
       },
 
       setUnits: (key, val) => {
@@ -261,14 +267,17 @@ export const useWeatherStore = create(
         set((state) => ({
           effects: { ...state.effects, [key]: val },
         }));
+        get().applyCurrentTheme();
       },
 
       setAnimationIntensity: (intensity) => {
         set({ animationIntensity: intensity });
+        get().applyCurrentTheme();
       },
 
       setReducedMotion: (reduced) => {
         set({ reducedMotion: reduced });
+        get().applyCurrentTheme();
       },
 
       // Personalization Profiles Actions
@@ -425,117 +434,29 @@ export const useWeatherStore = create(
           customColors: s.customColors,
           glassSettings: s.glassSettings,
           typography: s.typography,
+          effects: s.effects,
           liveWeather: s.weather,
+          selectedHour: s.selectedHour,
         });
       },
 
-      // Fetch Weather Telemetry
-      fetchData: async (lat, lon) => {
-        const requestId = ++latestRequestId;
-        set({ loading: true, error: null });
-
-        try {
-          const [weatherData, aqData] = await Promise.allSettled([
-            fetchWeather(lat, lon),
-            fetchAirQuality(lat, lon),
-          ]);
-
-          if (requestId !== latestRequestId) return;
-
-          if (weatherData.status === 'rejected') {
-            throw new Error(weatherData.reason?.message || 'Failed to fetch weather');
-          }
-
-          set({
-            weather: weatherData.value,
-            airQuality: aqData.status === 'fulfilled' && aqData.value ? aqData.value : { current: null, error: 'AQI_UNAVAILABLE' },
-            loading: false,
-            isTransitioning: false,
-            lastUpdated: new Date().toISOString(),
-            error: null,
-          });
-
-          // Re-apply theme in case Weather Reactive mode is active
-          get().applyCurrentTheme();
-        } catch (err) {
-          if (requestId !== latestRequestId) return;
-          set({
-            loading: false,
-            isTransitioning: false,
-            error: err.message || 'Weather data couldn\'t be loaded. Check your connection and try again.',
-          });
-        }
+      // Master Environmental State
+      getCurrentEnvironment: () => {
+        const s = get();
+        return calculateAtmosEnvironment({
+          weather: s.weather,
+          selectedHour: s.selectedHour,
+          themePreset: s.themePreset,
+          themeMode: s.themeMode,
+          customColors: s.customColors,
+          glassSettings: s.glassSettings,
+          typography: s.typography,
+          effects: s.effects,
+        });
       },
 
       getCurrentTheme: () => {
-        const s = get();
-        const { weather, selectedHour, themePreset, themeMode, customColors } = s;
-
-        if (!weather?.current) {
-          const fallbackBase = getAtmosphereTheme(0, 1, 12);
-          const preset = THEME_PRESETS.find((p) => p.id === themePreset) || THEME_PRESETS[0];
-          return {
-            ...fallbackBase,
-            skyTop: preset.skyTop || preset.bg,
-            skyMid: preset.skyMid || fallbackBase.skyMid,
-            skyBottom: preset.skyBottom || fallbackBase.skyBottom,
-            accent: customColors?.accent || preset.accent || fallbackBase.accent,
-            glow: customColors?.glow || preset.glow || fallbackBase.accent,
-          };
-        }
-
-        const now = new Date();
-        const currentHour = selectedHour !== null ? selectedHour : now.getHours();
-        const sunrise = weather.daily?.sunrise?.[0] || null;
-        const sunset = weather.daily?.sunset?.[0] || null;
-
-        let code = weather.current.weather_code;
-        if (selectedHour !== null && weather.hourly?.weather_code) {
-          code = weather.hourly.weather_code[selectedHour] ?? code;
-        }
-
-        const isDay = selectedHour !== null
-          ? (selectedHour >= 6 && selectedHour < 19 ? 1 : 0)
-          : weather.current.is_day;
-
-        const atmosTheme = getAtmosphereTheme(code, isDay, currentHour, sunrise, sunset);
-
-        // When in Weather Reactive mode (and not overridden by AMOLED or Light mode), use full dynamic atmospheric colors
-        if (themePreset === 'reactive' && themeMode !== 'amoled' && themeMode !== 'light') {
-          if (customColors?.accent) {
-            atmosTheme.accent = customColors.accent;
-            atmosTheme.glow = customColors.glow || customColors.accent;
-          }
-          return atmosTheme;
-        }
-
-        // When a specific theme preset is chosen, merge its sky palette while preserving real atmospheric physics & particles
-        const preset = THEME_PRESETS.find((p) => p.id === themePreset) || THEME_PRESETS[0];
-
-        let skyTop = preset.skyTop || preset.bg || atmosTheme.skyTop;
-        let skyMid = preset.skyMid || atmosTheme.skyMid;
-        let skyBottom = preset.skyBottom || atmosTheme.skyBottom;
-        let accent = customColors?.accent || preset.accent || atmosTheme.accent;
-        let glow = customColors?.glow || preset.glow || atmosTheme.accent;
-
-        if (themeMode === 'amoled') {
-          skyTop = '#000000';
-          skyMid = '#000000';
-          skyBottom = '#050508';
-        } else if (themeMode === 'light') {
-          skyTop = '#CBD5E1';
-          skyMid = '#93C5FD';
-          skyBottom = '#60A5FA';
-        }
-
-        return {
-          ...atmosTheme,
-          skyTop,
-          skyMid,
-          skyBottom,
-          accent,
-          glow,
-        };
+        return get().getCurrentEnvironment();
       },
     }),
     {
@@ -543,6 +464,18 @@ export const useWeatherStore = create(
       version: 2,
       onRehydrateStorage: () => (state) => {
         if (state) {
+          if (state.dashboard?.sections && Array.isArray(state.dashboard.sections)) {
+            const currentIds = new Set(state.dashboard.sections.map((s) => s.id));
+            let updated = [...state.dashboard.sections];
+            if (!currentIds.has('hero')) {
+              updated.unshift({ id: 'hero', name: 'Current Weather & Location', visible: true });
+            }
+            if (!currentIds.has('dailybrief')) {
+              const heroIdx = updated.findIndex((s) => s.id === 'hero');
+              updated.splice(heroIdx + 1, 0, { id: 'dailybrief', name: 'Atmos Daily Brief Strip', visible: true });
+            }
+            state.dashboard.sections = updated;
+          }
           state.applyCurrentTheme?.();
         }
       },
