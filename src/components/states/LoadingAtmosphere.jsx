@@ -4,7 +4,7 @@ import { Sparkles } from 'lucide-react';
 
 export function LoadingAtmosphere({ city = 'Atmosphere' }) {
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#080B10] px-4 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--atmos-bg,#080B10)] px-4 overflow-hidden">
       {/* Ambient Pulsing Atmospheric Aura */}
       <div className="absolute w-96 h-96 rounded-full bg-sky-500/15 blur-[100px] animate-pulse-slow" />
       <div className="absolute w-80 h-80 rounded-full bg-indigo-500/10 blur-[80px] -top-10 -left-10 animate-float" />
@@ -16,7 +16,7 @@ export function LoadingAtmosphere({ city = 'Atmosphere' }) {
           transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
           className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-sky-400 to-indigo-500 p-0.5 shadow-2xl shadow-sky-500/30"
         >
-          <div className="w-full h-full bg-[#080B10] rounded-[22px] flex items-center justify-center">
+          <div className="w-full h-full bg-[var(--atmos-bg,#080B10)] rounded-[22px] flex items-center justify-center">
             <Sparkles className="w-7 h-7 text-sky-400 animate-spin-slow" />
           </div>
         </motion.div>

@@ -4,7 +4,6 @@ import { ChevronDown, Loader2 } from 'lucide-react';
 import { useWeatherStore } from '../../store/weatherStore';
 import { WeatherInfo } from './WeatherInfo';
 import { DailyBrief } from './DailyBrief';
-import { WeatherEnvironment } from '../environment/WeatherEnvironment';
 
 export function HeroSection({ onEnterImmersive, onOpenShare }) {
   const weather = useWeatherStore((s) => s.weather);
@@ -45,11 +44,6 @@ export function HeroSection({ onEnterImmersive, onOpenShare }) {
 
   return (
     <section className="relative w-full min-h-[92svh] sm:min-h-[96svh] flex flex-col justify-between overflow-hidden px-3.5 sm:px-8 lg:px-14 pt-16 sm:pt-24 pb-4 sm:pb-8">
-      {/* 1. Living Atmospheric Environment (Canvas + Sky + Celestial + Particles) */}
-      <div className="absolute inset-0 z-0">
-        <WeatherEnvironment />
-      </div>
-
       {/* Subtle indicator ONLY when time-travel scrubbing or transitioning */}
       <div className="relative z-10 max-w-7xl w-full mx-auto flex items-center justify-between min-h-[24px]">
         {selectedHour !== null ? (

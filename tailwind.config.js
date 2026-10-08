@@ -8,9 +8,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['var(--atmos-font-family)', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
-        display: ['"Cabinet Grotesk"', '"Plus Jakarta Sans"', 'sans-serif'],
+        display: ['var(--atmos-font-family)', '"Cabinet Grotesk"', 'sans-serif'],
       },
       colors: {
         atmos: {

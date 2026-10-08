@@ -47,11 +47,6 @@ export function TemperatureDisplay({ tempCelsius }) {
           aria-label={`Current unit is ${units.temp}. Click to switch.`}
         >
           <span>{renderUnitLabel()}</span>
-          {tempFormat === 'clean' && (
-            <span className="text-[10px] text-sky-400/60 font-semibold group-hover:text-sky-300 ml-0.5 tracking-wider uppercase">
-              {units.temp}
-            </span>
-          )}
         </button>
       </div>
     </div>

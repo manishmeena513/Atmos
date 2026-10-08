@@ -259,6 +259,15 @@ export function AtmosStudioModal() {
                         )}
                       </button>
                     ))}
+                    <div className="flex items-center gap-2 pl-2">
+                      <input
+                        type="color"
+                        value={customColors.accent || '#38BDF8'}
+                        onChange={(e) => setCustomColors({ accent: e.target.value, glow: e.target.value })}
+                        className="w-7 h-7 rounded-lg border border-white/20 bg-transparent cursor-pointer"
+                        title="Pick custom color"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -302,13 +311,54 @@ export function AtmosStudioModal() {
                       step="4"
                       value={glassSettings.blur || 20}
                       onChange={(e) => setGlassSetting('blur', parseInt(e.target.value, 10))}
-                      className="w-full cursor-pointer"
+                      className="w-full cursor-pointer accent-sky-400"
                     />
+                  </div>
+
+                  {/* Surface Opacity Slider */}
+                  <div>
+                    <div className="flex justify-between text-[11px] text-slate-400 mb-1">
+                      <span>Surface Opacity</span>
+                      <span className="text-white font-mono">{glassSettings.opacity || 12}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="4"
+                      max="32"
+                      step="2"
+                      value={glassSettings.opacity || 12}
+                      onChange={(e) => setGlassSetting('opacity', parseInt(e.target.value, 10))}
+                      className="w-full cursor-pointer accent-sky-400"
+                    />
+                  </div>
+
+                  {/* Glass Tint */}
+                  <div>
+                    <span className="text-[11px] text-slate-400 block mb-1.5">Environmental Glass Tint</span>
+                    <div className="grid grid-cols-3 gap-1.5 p-1 bg-black/30 rounded-xl">
+                      {[
+                        { id: 'none', label: 'Neutral' },
+                        { id: 'cool', label: 'Cool Cyan' },
+                        { id: 'warm', label: 'Warm Amber' },
+                      ].map((t) => (
+                        <button
+                          key={t.id}
+                          onClick={() => setGlassSetting('tint', t.id)}
+                          className={`py-1.5 rounded-lg text-xs font-bold transition-all ${
+                            (glassSettings.tint || 'none') === t.id
+                              ? 'bg-sky-500 text-white shadow'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          {t.label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Border Styling */}
                   <div>
-                    <span className="text-[11px] text-slate-400 block mb-1.5">Glass Border</span>
+                    <span className="text-[11px] text-slate-400 block mb-1.5">Glass Border &amp; Specular Rim</span>
                     <div className="grid grid-cols-3 gap-1.5 p-1 bg-black/30 rounded-xl">
                       {['off', 'subtle', 'bright'].map((b) => (
                         <button
@@ -321,6 +371,30 @@ export function AtmosStudioModal() {
                           }`}
                         >
                           {b}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Ambient Shadow */}
+                  <div>
+                    <span className="text-[11px] text-slate-400 block mb-1.5">Ambient Shadow</span>
+                    <div className="grid grid-cols-3 gap-1.5 p-1 bg-black/30 rounded-xl">
+                      {[
+                        { id: 'off', label: 'Off' },
+                        { id: 'soft', label: 'Soft' },
+                        { id: 'deep', label: 'Deep' },
+                      ].map((s) => (
+                        <button
+                          key={s.id}
+                          onClick={() => setGlassSetting('shadow', s.id)}
+                          className={`py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                            (glassSettings.shadow || 'soft') === s.id
+                              ? 'bg-sky-500 text-white shadow'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          {s.label}
                         </button>
                       ))}
                     </div>
@@ -350,6 +424,30 @@ export function AtmosStudioModal() {
                           style={{ fontFamily: f.family }}
                         >
                           {f.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Text Scale */}
+                  <div>
+                    <span className="text-[11px] text-slate-400 block mb-1.5">Typeface Scale</span>
+                    <div className="grid grid-cols-3 gap-1.5 p-1 bg-black/30 rounded-xl text-center">
+                      {[
+                        { id: 'small', label: 'Compact' },
+                        { id: 'medium', label: 'Standard' },
+                        { id: 'large', label: 'Comfort' },
+                      ].map((sc) => (
+                        <button
+                          key={sc.id}
+                          onClick={() => setTypographySetting('scale', sc.id)}
+                          className={`py-1.5 rounded-lg text-xs font-bold transition-all ${
+                            (typography.scale || 'medium') === sc.id
+                              ? 'bg-sky-500 text-white shadow'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                        >
+                          {sc.label}
                         </button>
                       ))}
                     </div>

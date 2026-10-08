@@ -5,6 +5,7 @@ import { Header } from './components/layout/Header';
 import { Navigation } from './components/layout/Navigation';
 import { SectionWrapper } from './components/layout/SectionWrapper';
 import { HeroSection } from './components/hero/HeroSection';
+import { WeatherEnvironment } from './components/environment/WeatherEnvironment';
 import { TodayTimeline } from './components/timeline/TodayTimeline';
 import { HourlyForecast } from './components/hourly/HourlyForecast';
 import { DayIntelligenceGrid } from './components/intelligence/DayIntelligenceGrid';
@@ -41,11 +42,15 @@ export function App() {
   const fetchData = useWeatherStore((s) => s.fetchData);
 
   // V2.5 Personalization State
-  const theme = useWeatherStore((s) => s.theme);
-  const glass = useWeatherStore((s) => s.glass);
+  const themePreset = useWeatherStore((s) => s.themePreset);
+  const themeMode = useWeatherStore((s) => s.themeMode);
+  const customColors = useWeatherStore((s) => s.customColors);
+  const glassSettings = useWeatherStore((s) => s.glassSettings);
   const typography = useWeatherStore((s) => s.typography);
-  const performance = useWeatherStore((s) => s.performance);
+  const effects = useWeatherStore((s) => s.effects);
   const dashboard = useWeatherStore((s) => s.dashboard);
+  const autoAdapt = useWeatherStore((s) => s.autoAdapt);
+  const applyCurrentTheme = useWeatherStore((s) => s.applyCurrentTheme);
 
   // Deep-dive state
   const isDeepDiveOpen = useWeatherStore((s) => s.isDeepDiveOpen);
@@ -66,32 +71,10 @@ export function App() {
     fetchData(location.lat, location.lon);
   }, []);
 
-  // Synchronize CSS custom properties & theme engine
+  // Synchronize CSS custom properties & theme engine in real time
   useEffect(() => {
-    let activePreset = theme?.preset || 'classic';
-
-    // Auto Adapt based on celestial hour & conditions
-    if (theme?.autoAdapt && weather?.current) {
-      const isDay = weather.current.is_day;
-      const hour = new Date().getHours();
-      if (!isDay && (hour < 5 || hour >= 21)) {
-        activePreset = 'midnight';
-      } else if ((hour >= 5 && hour < 8) || (hour >= 18 && hour < 21)) {
-        activePreset = 'sunset';
-      } else {
-        activePreset = 'weather-reactive';
-      }
-    }
-
-    applyTheme(
-      { ...(theme || {}), preset: activePreset },
-      glass || {},
-      typography || {},
-      performance || {},
-      weather?.current?.weather_code,
-      weather?.current?.is_day
-    );
-  }, [theme, glass, typography, performance, weather]);
+    applyCurrentTheme();
+  }, [themePreset, themeMode, customColors, glassSettings, typography, effects, autoAdapt, weather]);
 
   // Section Component Registry
   const renderSection = (id) => {
@@ -190,7 +173,12 @@ export function App() {
   ];
 
   return (
-    <div className="relative min-h-screen bg-[var(--bg-primary,#080B10)] text-slate-100 font-sans selection:bg-sky-500/30 selection:text-sky-200">
+    <div className="relative min-h-screen text-slate-100 font-sans selection:bg-sky-500/30 selection:text-sky-200">
+      {/* 0. Full-Viewport Living Weather Environment (Fixed Background across whole app) */}
+      <div className="fixed inset-0 z-0 pointer-events-none select-none overflow-hidden">
+        <WeatherEnvironment />
+      </div>
+
       {/* PWA & Offline Status Banner */}
       <OfflineBanner />
 
@@ -220,11 +208,11 @@ export function App() {
 
       {/* Error State or Main Content */}
       {error && !weather ? (
-        <main className="pt-24">
+        <main className="relative z-10 pt-24">
           <ErrorState error={error} onOpenSearch={() => setIsSearchOpen(true)} />
         </main>
       ) : (
-        <main className="relative">
+        <main className="relative z-10">
           {/* 1. Hero Atmospheric Living Stage + Atmos Daily Brief */}
           <div id="hero-section">
             <HeroSection
@@ -244,7 +232,7 @@ export function App() {
           {/* Dynamic Reorderable Dashboard Sections */}
           <div className={densityClass}>
             {orderedSections
-              .filter((s) => s.visible !== false)
+              .filter((s) => s.id !== 'hero' && s.visible !== false)
               .map((s) => renderSection(s.id))}
           </div>
 

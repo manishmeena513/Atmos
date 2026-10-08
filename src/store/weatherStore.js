@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { fetchWeather, fetchAirQuality } from '../api/openmeteo';
-import { getAtmosphereTheme } from '../utils/weatherTheme';
-import { applyThemeToDOM } from '../utils/themeEngine';
+import { fetchWeather, fetchAirQuality } from '../api/openmeteo.js';
+import { getAtmosphereTheme } from '../utils/weatherTheme.js';
+import { applyThemeToDOM, THEME_PRESETS } from '../utils/themeEngine.js';
 
 const DEFAULT_LOCATION = {
   name: 'Meerut',
@@ -51,7 +51,7 @@ export const useWeatherStore = create(
       },
 
       // Atmos Studio: Appearance & Theming
-      themePreset: 'classic', // 10 built-in presets: classic, reactive, midnight, amoled, sunset, ocean, evergreen, arctic, aurora, minimal_mono
+      themePreset: 'reactive', // 10 built-in presets: reactive, classic, midnight, amoled, sunset, ocean, evergreen, arctic, aurora, minimal_mono
       themeMode: 'dark', // 'dark' | 'light' | 'amoled' | 'reactive'
       customColors: {
         accent: '',
@@ -359,7 +359,7 @@ export const useWeatherStore = create(
       // Reset System
       resetAppearance: () => {
         set({
-          themePreset: 'classic',
+          themePreset: 'reactive',
           themeMode: 'dark',
           customColors: { accent: '', bg: '', glow: '', glassTint: '' },
           glassSettings: { level: 'medium', blur: 20, opacity: 12, border: 'subtle', shadow: 'soft', tint: 'none' },
@@ -468,9 +468,20 @@ export const useWeatherStore = create(
       },
 
       getCurrentTheme: () => {
-        const { weather, selectedHour } = get();
+        const s = get();
+        const { weather, selectedHour, themePreset, themeMode, customColors } = s;
+
         if (!weather?.current) {
-          return getAtmosphereTheme(0, 1, 12);
+          const fallbackBase = getAtmosphereTheme(0, 1, 12);
+          const preset = THEME_PRESETS.find((p) => p.id === themePreset) || THEME_PRESETS[0];
+          return {
+            ...fallbackBase,
+            skyTop: preset.skyTop || preset.bg,
+            skyMid: preset.skyMid || fallbackBase.skyMid,
+            skyBottom: preset.skyBottom || fallbackBase.skyBottom,
+            accent: customColors?.accent || preset.accent || fallbackBase.accent,
+            glow: customColors?.glow || preset.glow || fallbackBase.accent,
+          };
         }
 
         const now = new Date();
@@ -487,12 +498,54 @@ export const useWeatherStore = create(
           ? (selectedHour >= 6 && selectedHour < 19 ? 1 : 0)
           : weather.current.is_day;
 
-        return getAtmosphereTheme(code, isDay, currentHour, sunrise, sunset);
+        const atmosTheme = getAtmosphereTheme(code, isDay, currentHour, sunrise, sunset);
+
+        // When in Weather Reactive mode (and not overridden by AMOLED or Light mode), use full dynamic atmospheric colors
+        if (themePreset === 'reactive' && themeMode !== 'amoled' && themeMode !== 'light') {
+          if (customColors?.accent) {
+            atmosTheme.accent = customColors.accent;
+            atmosTheme.glow = customColors.glow || customColors.accent;
+          }
+          return atmosTheme;
+        }
+
+        // When a specific theme preset is chosen, merge its sky palette while preserving real atmospheric physics & particles
+        const preset = THEME_PRESETS.find((p) => p.id === themePreset) || THEME_PRESETS[0];
+
+        let skyTop = preset.skyTop || preset.bg || atmosTheme.skyTop;
+        let skyMid = preset.skyMid || atmosTheme.skyMid;
+        let skyBottom = preset.skyBottom || atmosTheme.skyBottom;
+        let accent = customColors?.accent || preset.accent || atmosTheme.accent;
+        let glow = customColors?.glow || preset.glow || atmosTheme.accent;
+
+        if (themeMode === 'amoled') {
+          skyTop = '#000000';
+          skyMid = '#000000';
+          skyBottom = '#050508';
+        } else if (themeMode === 'light') {
+          skyTop = '#CBD5E1';
+          skyMid = '#93C5FD';
+          skyBottom = '#60A5FA';
+        }
+
+        return {
+          ...atmosTheme,
+          skyTop,
+          skyMid,
+          skyBottom,
+          accent,
+          glow,
+        };
       },
     }),
     {
       name: 'atmos-settings-storage-v2',
       version: 2,
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.applyCurrentTheme?.();
+        }
+      },
       partialize: (state) => ({
         units: state.units,
         themePreset: state.themePreset,

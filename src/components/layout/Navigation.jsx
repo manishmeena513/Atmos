@@ -67,7 +67,7 @@ export function Navigation() {
     >
       <div
         ref={navTrackRef}
-        className="bg-[#0c121e]/85 backdrop-blur-xl border border-white/[0.08] shadow-[0_8px_30px_rgba(0,0,0,0.5)] rounded-full p-1 flex items-center gap-1 overflow-x-auto max-w-full scrollbar-none no-scrollbar pointer-events-auto touch-pan-x overscroll-x-contain"
+        className="glass-pill rounded-full p-1 flex items-center gap-1 overflow-x-auto max-w-full scrollbar-none no-scrollbar pointer-events-auto touch-pan-x overscroll-x-contain shadow-[0_8px_30px_rgba(0,0,0,0.4)]"
       >
         {NAV_ITEMS.map((item) => {
           const isActive = activeSection === item.id;

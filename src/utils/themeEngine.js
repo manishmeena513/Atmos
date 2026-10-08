@@ -1,4 +1,4 @@
-import { getAtmosphereTheme } from './weatherTheme';
+import { getAtmosphereTheme } from './weatherTheme.js';
 
 /**
  * Atmos V2.5 Centralized Theme Engine
@@ -6,19 +6,6 @@ import { getAtmosphereTheme } from './weatherTheme';
  */
 
 export const THEME_PRESETS = [
-  {
-    id: 'classic',
-    name: 'Classic Atmos',
-    description: 'Deep twilight with electric cyan & sky blue accents',
-    accent: '#38BDF8',
-    glow: '#0284C7',
-    bg: '#080B10',
-    surface: 'rgba(255, 255, 255, 0.08)',
-    border: 'rgba(255, 255, 255, 0.16)',
-    text: '#F1F5F9',
-    textMuted: '#94A3B8',
-    blobs: ['#0284C7', '#1E1B4B', '#0F172A'],
-  },
   {
     id: 'reactive',
     name: 'Weather Reactive',
@@ -30,6 +17,25 @@ export const THEME_PRESETS = [
     border: 'rgba(255, 255, 255, 0.16)',
     text: '#F1F5F9',
     textMuted: '#94A3B8',
+    skyTop: '#080E1A',
+    skyMid: '#0E1A2E',
+    skyBottom: '#182C48',
+    blobs: ['#0284C7', '#1E1B4B', '#0F172A'],
+  },
+  {
+    id: 'classic',
+    name: 'Classic Atmos',
+    description: 'Deep twilight with electric cyan & sky blue accents',
+    accent: '#38BDF8',
+    glow: '#0284C7',
+    bg: '#080B10',
+    surface: 'rgba(255, 255, 255, 0.08)',
+    border: 'rgba(255, 255, 255, 0.16)',
+    text: '#F1F5F9',
+    textMuted: '#94A3B8',
+    skyTop: '#080E1A',
+    skyMid: '#0E1A2E',
+    skyBottom: '#182C48',
     blobs: ['#0284C7', '#1E1B4B', '#0F172A'],
   },
   {
@@ -43,6 +49,9 @@ export const THEME_PRESETS = [
     border: 'rgba(129, 140, 248, 0.18)',
     text: '#EEF2FF',
     textMuted: '#A5B4FC',
+    skyTop: '#040612',
+    skyMid: '#090D24',
+    skyBottom: '#131A3D',
     blobs: ['#4338CA', '#1E1B4B', '#312E81'],
   },
   {
@@ -56,6 +65,9 @@ export const THEME_PRESETS = [
     border: 'rgba(255, 255, 255, 0.14)',
     text: '#FFFFFF',
     textMuted: '#A1A1AA',
+    skyTop: '#000000',
+    skyMid: '#000000',
+    skyBottom: '#050508',
     blobs: ['#0369A1', '#09090B', '#000000'],
   },
   {
@@ -69,6 +81,9 @@ export const THEME_PRESETS = [
     border: 'rgba(249, 115, 22, 0.20)',
     text: '#FFF7ED',
     textMuted: '#FDBA74',
+    skyTop: '#181224',
+    skyMid: '#481938',
+    skyBottom: '#9A3412',
     blobs: ['#EA580C', '#701A75', '#431407'],
   },
   {
@@ -82,6 +97,9 @@ export const THEME_PRESETS = [
     border: 'rgba(45, 212, 191, 0.18)',
     text: '#F0FDFA',
     textMuted: '#99F6E4',
+    skyTop: '#03141A',
+    skyMid: '#062832',
+    skyBottom: '#0D4E5C',
     blobs: ['#0F766E', '#134E4A', '#042F2E'],
   },
   {
@@ -95,6 +113,9 @@ export const THEME_PRESETS = [
     border: 'rgba(52, 211, 153, 0.18)',
     text: '#ECFDF5',
     textMuted: '#A7F3D0',
+    skyTop: '#04140D',
+    skyMid: '#092A1C',
+    skyBottom: '#0F4430',
     blobs: ['#047857', '#064E3B', '#022C22'],
   },
   {
@@ -108,6 +129,9 @@ export const THEME_PRESETS = [
     border: 'rgba(165, 243, 252, 0.22)',
     text: '#F0FDFE',
     textMuted: '#BAE6FD',
+    skyTop: '#06121C',
+    skyMid: '#0B2336',
+    skyBottom: '#153A52',
     blobs: ['#0E7490', '#164E63', '#083344'],
   },
   {
@@ -121,6 +145,9 @@ export const THEME_PRESETS = [
     border: 'rgba(192, 132, 252, 0.22)',
     text: '#FAF5FF',
     textMuted: '#E9D5FF',
+    skyTop: '#08061C',
+    skyMid: '#1C0D36',
+    skyBottom: '#0A332C',
     blobs: ['#9333EA', '#059669', '#4C1D95'],
   },
   {
@@ -134,6 +161,9 @@ export const THEME_PRESETS = [
     border: 'rgba(255, 255, 255, 0.18)',
     text: '#FFFFFF',
     textMuted: '#A1A1AA',
+    skyTop: '#08090B',
+    skyMid: '#121417',
+    skyBottom: '#1E2024',
     blobs: ['#27272A', '#18181B', '#09090B'],
   },
 ];
@@ -150,7 +180,9 @@ export const FONTS = [
  * Calculates relative luminance of an RGB/hex color.
  */
 function getLuminance(hex) {
+  if (!hex || typeof hex !== 'string') return 0.1;
   const cleanHex = hex.replace('#', '');
+  if (cleanHex.length < 6) return 0.1;
   const r = parseInt(cleanHex.substring(0, 2), 16) / 255;
   const g = parseInt(cleanHex.substring(2, 4), 16) / 255;
   const b = parseInt(cleanHex.substring(4, 6), 16) / 255;
@@ -167,7 +199,7 @@ function getLuminance(hex) {
 export function ensureAccessibleContrast(accentHex, bgHex) {
   try {
     const bgLum = getLuminance(bgHex || '#080B10');
-    const isDarkBg = bgLum < 0.2;
+    const isDarkBg = bgLum < 0.25;
 
     return {
       text: isDarkBg ? '#F8FAFC' : '#0F172A',
@@ -189,7 +221,7 @@ export function ensureAccessibleContrast(accentHex, bgHex) {
  * Applies the complete active theme to CSS custom properties on :root
  */
 export function applyThemeToDOM({
-  presetId = 'classic',
+  presetId = 'reactive',
   mode = 'dark',
   customColors = {},
   glassSettings = {},
@@ -217,6 +249,9 @@ export function applyThemeToDOM({
       accent: atmosTheme.accent || '#38BDF8',
       bg: atmosTheme.skyTop || '#080B10',
       glow: atmosTheme.accent || '#0284C7',
+      skyTop: atmosTheme.skyTop || '#080E1A',
+      skyMid: atmosTheme.skyMid || '#0E1A2E',
+      skyBottom: atmosTheme.skyBottom || '#182C48',
       blobs: [
         atmosTheme.skyMid || '#0F172A',
         atmosTheme.skyBottom || '#1E1B4B',
@@ -241,25 +276,79 @@ export function applyThemeToDOM({
 
   // 3. Resolve Glass Settings
   let glassBlur = '20px';
-  if (glassSettings.level === 'off') glassBlur = '0px';
-  else if (glassSettings.level === 'soft') glassBlur = '12px';
-  else if (glassSettings.level === 'strong') glassBlur = '32px';
-  else if (glassSettings.blur) glassBlur = `${glassSettings.blur}px`;
+  if (glassSettings.level === 'off') {
+    glassBlur = '0px';
+  } else if (glassSettings.blur !== undefined && glassSettings.blur !== null) {
+    glassBlur = `${glassSettings.blur}px`;
+  } else if (glassSettings.level === 'soft') {
+    glassBlur = '12px';
+  } else if (glassSettings.level === 'strong') {
+    glassBlur = '28px';
+  }
 
-  let glassOpacity = '0.08';
-  if (glassSettings.level === 'off') glassOpacity = '0.94';
-  else if (glassSettings.level === 'soft') glassOpacity = '0.06';
-  else if (glassSettings.level === 'strong') glassOpacity = '0.14';
-  else if (glassSettings.opacity) glassOpacity = `${glassSettings.opacity / 100}`;
+  // Dynamic alpha based on explicit opacity slider or intensity level
+  let alpha = 0.10;
+  if (glassSettings.level === 'off') {
+    alpha = 0.94;
+  } else if (typeof glassSettings.opacity === 'number') {
+    alpha = Math.max(0.04, Math.min(0.40, glassSettings.opacity / 100));
+  } else if (glassSettings.level === 'soft') {
+    alpha = 0.06;
+  } else if (glassSettings.level === 'strong') {
+    alpha = 0.16;
+  }
 
-  let glassBorder = contrast.border;
-  if (glassSettings.border === 'off') glassBorder = 'transparent';
-  else if (glassSettings.border === 'bright') glassBorder = 'rgba(255, 255, 255, 0.28)';
+  // Base surface color according to mode and opacity
+  let baseSurface = `rgba(255, 255, 255, ${alpha})`;
+  if (mode === 'light') {
+    baseSurface = `rgba(255, 255, 255, ${Math.max(0.68, 1 - alpha * 1.4)})`;
+  } else if (mode === 'amoled') {
+    baseSurface = `rgba(255, 255, 255, ${Math.min(alpha, 0.05)})`;
+  }
 
+  // Environmental Tint
   let glassTint = 'transparent';
-  if (glassSettings.tint === 'cool') glassTint = 'rgba(56, 189, 248, 0.04)';
-  else if (glassSettings.tint === 'warm') glassTint = 'rgba(251, 146, 60, 0.04)';
-  else if (glassSettings.tint === 'custom' && customColors.glassTint) glassTint = customColors.glassTint;
+  if (glassSettings.tint === 'cool') {
+    glassTint = 'rgba(56, 189, 248, 0.07)';
+  } else if (glassSettings.tint === 'warm') {
+    glassTint = 'rgba(251, 146, 60, 0.07)';
+  } else if (glassSettings.tint === 'custom' && customColors.glassTint) {
+    glassTint = customColors.glassTint;
+  }
+
+  // Composite surface: layer environmental tint over frosted white alpha
+  let computedSurface = baseSurface;
+  if (glassTint !== 'transparent') {
+    computedSurface = `linear-gradient(0deg, ${glassTint}, ${glassTint}), ${baseSurface}`;
+  }
+
+  // Glass Border
+  let glassBorder = contrast.border;
+  if (glassSettings.border === 'off') {
+    glassBorder = 'transparent';
+  } else if (glassSettings.border === 'subtle') {
+    glassBorder = 'rgba(255, 255, 255, 0.12)';
+  } else if (glassSettings.border === 'bright') {
+    glassBorder = 'rgba(255, 255, 255, 0.28)';
+  }
+
+  // Specular Rim Highlight (Inset Top 1px)
+  let glassSpecular = 'rgba(255, 255, 255, 0.16)';
+  if (glassSettings.border === 'off') {
+    glassSpecular = 'rgba(255, 255, 255, 0.04)';
+  } else if (glassSettings.border === 'bright') {
+    glassSpecular = 'rgba(255, 255, 255, 0.28)';
+  }
+
+  // Ambient Drop Shadow
+  let glassShadow = '0 8px 32px 0 rgba(0, 0, 0, 0.32)';
+  if (glassSettings.shadow === 'off') {
+    glassShadow = 'none';
+  } else if (glassSettings.shadow === 'soft') {
+    glassShadow = '0 4px 20px 0 rgba(0, 0, 0, 0.22)';
+  } else if (glassSettings.shadow === 'deep') {
+    glassShadow = '0 16px 48px 0 rgba(0, 0, 0, 0.52)';
+  }
 
   // 4. Resolve Typography
   const fontObj = FONTS.find((f) => f.id === typography.font) || FONTS[0];
@@ -267,19 +356,26 @@ export function applyThemeToDOM({
   if (typography.scale === 'small') textScale = 0.92;
   else if (typography.scale === 'large') textScale = 1.08;
 
-  // 5. Inject CSS variables
+  // 5. Inject CSS custom properties to :root
   root.style.setProperty('--atmos-accent', accent);
   root.style.setProperty('--atmos-glow', glow);
   root.style.setProperty('--atmos-bg', bg);
-  root.style.setProperty('--atmos-surface', contrast.surface);
+  root.style.setProperty('--atmos-surface', computedSurface);
   root.style.setProperty('--atmos-border', glassBorder);
   root.style.setProperty('--atmos-text', contrast.text);
   root.style.setProperty('--atmos-text-muted', contrast.textMuted);
   root.style.setProperty('--atmos-glass-blur', glassBlur);
-  root.style.setProperty('--atmos-glass-opacity', glassOpacity);
+  root.style.setProperty('--atmos-glass-opacity', `${alpha}`);
   root.style.setProperty('--atmos-glass-tint', glassTint);
+  root.style.setProperty('--atmos-glass-specular', glassSpecular);
+  root.style.setProperty('--atmos-glass-shadow', glassShadow);
   root.style.setProperty('--atmos-font-family', fontObj.family);
   root.style.setProperty('--atmos-text-scale', `${textScale}`);
+
+  // Backward compatibility variables
+  root.style.setProperty('--bg-primary', bg);
+  root.style.setProperty('--accent-primary', accent);
+  root.style.setProperty('--text-primary', contrast.text);
 
   // Dynamic document meta theme-color
   const metaTheme = document.querySelector('meta[name="theme-color"]');
@@ -300,7 +396,7 @@ export function applyThemeToDOM({
  */
 export function applyTheme(themeConfig = {}, glassConfig = {}, typographyConfig = {}, performanceConfig = {}, weatherCode = null, isDay = 1) {
   return applyThemeToDOM({
-    presetId: themeConfig?.preset || 'classic',
+    presetId: themeConfig?.preset || 'reactive',
     mode: themeConfig?.mode || 'dark',
     customColors: themeConfig?.customColors || {},
     glassSettings: glassConfig || {},

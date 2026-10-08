@@ -15,6 +15,8 @@
     --atmos-glass-blur: 20px;
     --atmos-glass-opacity: 0.08;
     --atmos-glass-tint: transparent;
+    --atmos-glass-specular: rgba(255, 255, 255, 0.16);
+    --atmos-glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.32);
     --atmos-font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     --atmos-text-scale: 1.0;
   }
@@ -61,18 +63,21 @@
   background: rgba(255, 255, 255, 0.24);
 }
 
-/* Authentic Layered Glass System with Dynamic CSS Custom Properties */
+/* Authentic Multi-Layer Liquid Glass System */
 .glass-panel {
   background: var(--atmos-surface);
-  backdrop-filter: blur(var(--atmos-glass-blur)) saturate(135%);
-  -webkit-backdrop-filter: blur(var(--atmos-glass-blur)) saturate(135%);
+  backdrop-filter: blur(var(--atmos-glass-blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--atmos-glass-blur)) saturate(140%);
   border: 1px solid var(--atmos-border);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.32),
-              inset 0 1px 0 0 rgba(255, 255, 255, 0.15),
-              inset 0 -1px 0 0 rgba(0, 0, 0, 0.15);
+  box-shadow: var(--atmos-glass-shadow, 0 8px 32px 0 rgba(0, 0, 0, 0.32)),
+              inset 0 1px 0 0 var(--atmos-glass-specular, rgba(255, 255, 255, 0.16)),
+              inset 0 -1px 0 0 rgba(0, 0, 0, 0.12);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   transform: translateZ(0);
+  transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-panel-hover {
@@ -83,23 +88,24 @@
 }
 
 .glass-panel-hover:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.24);
+  background: color-mix(in srgb, var(--atmos-surface) 80%, white 20%);
+  border-color: rgba(255, 255, 255, 0.26);
   transform: translateY(-2px);
   box-shadow: 0 14px 40px 0 rgba(0, 0, 0, 0.42),
-              inset 0 1px 0 0 rgba(255, 255, 255, 0.22);
+              inset 0 1px 0 0 rgba(255, 255, 255, 0.24);
 }
 
 .glass-pill {
   background: var(--atmos-surface);
-  backdrop-filter: blur(calc(var(--atmos-glass-blur) * 0.75)) saturate(130%);
-  -webkit-backdrop-filter: blur(calc(var(--atmos-glass-blur) * 0.75)) saturate(130%);
+  backdrop-filter: blur(calc(var(--atmos-glass-blur) * 0.75)) saturate(135%);
+  -webkit-backdrop-filter: blur(calc(var(--atmos-glass-blur) * 0.75)) saturate(135%);
   border: 1px solid var(--atmos-border);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22),
-              inset 0 1px 0 0 rgba(255, 255, 255, 0.14);
+              inset 0 1px 0 0 var(--atmos-glass-specular, rgba(255, 255, 255, 0.14));
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   transform: translateZ(0);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 /* Density Modifiers */

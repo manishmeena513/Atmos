@@ -1,4 +1,4 @@
-import { getWmoInfo } from './wmoCodeMap';
+import { getWmoInfo } from './wmoCodeMap.js';
 
 /**
  * Atmosphere Theme Engine
@@ -10,14 +10,23 @@ export function getAtmosphereTheme(weatherCode = 0, isDay = 1, currentHour = 12,
   const wmo = getWmoInfo(weatherCode);
   const category = wmo.category; // clear, partly_cloudy, cloudy, fog, rain, heavy_rain, snow, thunderstorm
 
-  // Parse sunrise / sunset hours if available
+  // Parse sunrise / sunset hours if available (Open-Meteo returns ISO local time strings e.g. "2026-10-08T06:15")
   let sunriseH = 6;
   let sunsetH = 18;
-  if (sunriseStr) {
+  if (typeof sunriseStr === 'string' && sunriseStr.includes('T')) {
+    const timePart = sunriseStr.split('T')[1];
+    const [h, m] = timePart.split(':').map(Number);
+    if (!isNaN(h)) sunriseH = h + (isNaN(m) ? 0 : m / 60);
+  } else if (sunriseStr) {
     const sDate = new Date(sunriseStr);
     if (!isNaN(sDate.getTime())) sunriseH = sDate.getHours() + sDate.getMinutes() / 60;
   }
-  if (sunsetStr) {
+
+  if (typeof sunsetStr === 'string' && sunsetStr.includes('T')) {
+    const timePart = sunsetStr.split('T')[1];
+    const [h, m] = timePart.split(':').map(Number);
+    if (!isNaN(h)) sunsetH = h + (isNaN(m) ? 0 : m / 60);
+  } else if (sunsetStr) {
     const sDate = new Date(sunsetStr);
     if (!isNaN(sDate.getTime())) sunsetH = sDate.getHours() + sDate.getMinutes() / 60;
   }

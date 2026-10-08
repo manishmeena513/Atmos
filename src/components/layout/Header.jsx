@@ -109,7 +109,7 @@ export function Header({
       <header
         className={`fixed top-0 inset-x-0 z-40 transition-all duration-300 ${
           scrolled
-            ? 'bg-[#080B10]/85 backdrop-blur-xl border-b border-white/[0.08] shadow-2xl py-2 sm:py-2.5'
+            ? 'bg-[var(--atmos-bg)]/85 backdrop-blur-xl border-b border-white/[0.08] shadow-2xl py-2 sm:py-2.5'
             : 'bg-transparent py-3 sm:py-5'
         }`}
       >
@@ -117,7 +117,7 @@ export function Header({
           {/* Primary Control 1: Atmos Wordmark Branding */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
             <div className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-500 p-0.5 shadow-md shadow-sky-500/20 shrink-0">
-              <div className="w-full h-full bg-[#080B10] rounded-[10px] flex items-center justify-center">
+              <div className="w-full h-full bg-[var(--atmos-bg,#080B10)] rounded-[10px] flex items-center justify-center">
                 <CloudSun className="w-4 h-4 text-sky-400" />
               </div>
             </div>
