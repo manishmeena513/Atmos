@@ -15,15 +15,15 @@ const DEFAULT_LOCATION = {
 
 const DEFAULT_DASHBOARD_SECTIONS = [
   { id: 'hero', name: 'Current Weather & Brief', visible: true },
-  { id: 'timeline', name: 'Weather Time Machine', visible: true },
   { id: 'hourly', name: 'Hourly Forecast', visible: true },
   { id: 'intelligence', name: 'Day Guide (Rain, Wear, Comfort)', visible: true },
-  { id: 'insights', name: 'Weather Insights & Trends', visible: true },
-  { id: 'activity', name: 'Should I Go Out? Activities', visible: true },
   { id: 'forecast', name: '7-Day Forecast & Curve', visible: true },
   { id: 'details', name: 'Atmospheric Telemetry', visible: true },
   { id: 'airquality', name: 'Air Quality & Sunlight Cycle', visible: true },
-  { id: 'compare', name: 'City Comparison Matrix', visible: true },
+  { id: 'timeline', name: 'Weather Time Machine', visible: false },
+  { id: 'insights', name: 'Weather Insights & Trends', visible: false },
+  { id: 'activity', name: 'Should I Go Out? Activities', visible: false },
+  { id: 'compare', name: 'City Comparison Matrix', visible: false },
 ];
 
 let latestRequestId = 0;

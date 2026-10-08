@@ -178,15 +178,15 @@ export function App() {
       : 'space-y-8 my-4';
 
   const orderedSections = dashboard?.sections || [
-    { id: 'timeline', visible: true },
     { id: 'hourly', visible: true },
     { id: 'intelligence', visible: true },
-    { id: 'insights', visible: true },
-    { id: 'activity', visible: true },
     { id: 'forecast', visible: true },
     { id: 'details', visible: true },
     { id: 'airquality', visible: true },
-    { id: 'compare', visible: true },
+    { id: 'timeline', visible: false },
+    { id: 'insights', visible: false },
+    { id: 'activity', visible: false },
+    { id: 'compare', visible: false },
   ];
 
   return (
@@ -212,6 +212,7 @@ export function App() {
         onOpenTravel={() => setIsTravelOpen(true)}
         onOpenPlan={() => setIsPlanOpen(true)}
         onOpenMemories={() => setIsMemoriesOpen(true)}
+        onOpenShare={() => setIsShareOpen(true)}
       />
 
       {/* Initial Loading Screen */}
@@ -320,6 +321,7 @@ export function App() {
       <SettingsPanel
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+        onOpenStudio={() => setIsStudioOpen(true)}
       />
 
       <ShareWeatherModal

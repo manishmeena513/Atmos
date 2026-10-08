@@ -1,8 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Sparkles, Maximize2, Loader2 } from 'lucide-react';
+import { ChevronDown, Loader2 } from 'lucide-react';
 import { useWeatherStore } from '../../store/weatherStore';
-import { TemperatureDisplay } from './TemperatureDisplay';
 import { WeatherInfo } from './WeatherInfo';
 import { DailyBrief } from './DailyBrief';
 import { WeatherEnvironment } from '../environment/WeatherEnvironment';
@@ -45,103 +44,76 @@ export function HeroSection({ onEnterImmersive, onOpenShare }) {
   };
 
   return (
-    <section className="relative w-full min-h-[100svh] flex flex-col justify-between overflow-hidden px-4 sm:px-8 lg:px-14 pt-20 sm:pt-24 pb-6 sm:pb-8">
+    <section className="relative w-full min-h-[92svh] sm:min-h-[96svh] flex flex-col justify-between overflow-hidden px-3.5 sm:px-8 lg:px-14 pt-16 sm:pt-24 pb-4 sm:pb-8">
       {/* 1. Living Atmospheric Environment (Canvas + Sky + Celestial + Particles) */}
       <div className="absolute inset-0 z-0">
         <WeatherEnvironment />
       </div>
 
-      {/* 2. Floating Atmospheric Status Pill & Enter Weather Action */}
-      <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.6 }}
-        className="relative z-10 max-w-7xl w-full mx-auto flex flex-wrap items-center justify-between gap-3"
-      >
-        <div className="flex flex-wrap items-center gap-2.5">
-          {selectedHour !== null ? (
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-xs font-medium backdrop-blur-md">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-              <span>Time Travel Mode: {String(selectedHour).padStart(2, '0')}:00 Forecast</span>
-            </div>
-          ) : (
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/15 text-slate-200 text-xs font-medium backdrop-blur-md shadow-lg">
-              <Sparkles className="w-3.5 h-3.5 text-sky-400" />
-              <span>Atmos Intelligence · Explain the Day</span>
-            </div>
+      {/* Subtle indicator ONLY when time-travel scrubbing or transitioning */}
+      <div className="relative z-10 max-w-7xl w-full mx-auto flex items-center justify-between min-h-[24px]">
+        {selectedHour !== null ? (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-xs font-medium backdrop-blur-md">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+            <span>Time Travel: {String(selectedHour).padStart(2, '0')}:00 Forecast</span>
+          </div>
+        ) : <div />}
+
+        <AnimatePresence>
+          {isTransitioning && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.92 }}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-xs font-medium backdrop-blur-md"
+            >
+              <Loader2 className="w-3 h-3 animate-spin" />
+              <span>Syncing {location.name}...</span>
+            </motion.div>
           )}
+        </AnimatePresence>
+      </div>
 
-          <AnimatePresence>
-            {isTransitioning && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.92 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.92 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sky-500/20 border border-sky-400/30 text-sky-300 text-xs font-medium backdrop-blur-md"
-              >
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                <span>Syncing {location.name}...</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        <button
-          onClick={onEnterImmersive}
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/[0.08] hover:bg-sky-500 hover:text-white border border-white/15 text-slate-200 text-xs font-semibold backdrop-blur-md transition-all shadow-md cursor-pointer group"
-          title="Experience full-screen atmospheric immersion"
-        >
-          <Maximize2 className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" />
-          <span>Enter Weather</span>
-        </button>
-      </motion.div>
-
-      {/* 3. Hero Main Stage: Huge Temperature + WeatherInfo + Daily Brief */}
+      {/* 2. Hero Main Stage: Current Weather, Meaning, Metrics & Daily Brief */}
       <motion.div
         key={`${location.lat}-${location.lon}`}
         initial={{ opacity: 0.65, y: 8 }}
         animate={{ opacity: isTransitioning ? 0.65 : 1, y: 0 }}
         transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-        className="relative z-10 my-auto py-4 flex flex-col gap-6 max-w-7xl w-full mx-auto"
+        className="relative z-10 my-auto py-2 sm:py-4 flex flex-col gap-4 sm:gap-6 max-w-7xl w-full mx-auto"
       >
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 lg:gap-10">
-          <div className="flex-1">
-            <TemperatureDisplay tempCelsius={activeTemp} />
-          </div>
-
-          <div className="flex-1 max-w-2xl">
-            <WeatherInfo
-              current={currentDisplayData}
-              daily={weather.daily}
-              location={location}
-              timezone={weather.timezone}
-              onOpenShare={onOpenShare}
-            />
-          </div>
-        </div>
+        <WeatherInfo
+          current={currentDisplayData}
+          daily={weather.daily}
+          location={location}
+          timezone={weather.timezone}
+          onOpenShare={onOpenShare}
+        />
 
         {/* 4-Part Atmos Daily Brief Strip */}
         <DailyBrief />
       </motion.div>
 
-      {/* 4. Bottom Scroll Cue */}
+      {/* 3. Bottom Minimal Scroll Cue */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.6, duration: 0.8 }}
-        className="relative z-10 flex justify-center mt-2"
+        transition={{ delay: 0.5, duration: 0.6 }}
+        className="relative z-10 flex justify-center mt-1"
       >
         <button
           onClick={scrollToTimeline}
-          className="flex flex-col items-center gap-1 text-slate-400/80 hover:text-white transition-colors duration-200 cursor-pointer group"
+          className="flex flex-col items-center gap-0.5 text-slate-400/70 hover:text-white transition-colors cursor-pointer group"
           aria-label="Scroll to hourly forecast"
         >
-          <span className="text-[11px] uppercase tracking-widest font-medium opacity-70 group-hover:opacity-100 transition-opacity">
-            Explore Hourly & Intelligence
+          <span className="text-[10px] uppercase tracking-widest font-medium opacity-60 group-hover:opacity-100 transition-opacity">
+            Hourly Forecast & Telemetry
           </span>
-          <ChevronDown className="w-4 h-4 animate-bounce opacity-70 group-hover:opacity-100" />
+          <ChevronDown className="w-3.5 h-3.5 animate-bounce opacity-60 group-hover:opacity-100" />
         </button>
       </motion.div>
     </section>
   );
 }
+
+export default HeroSection;

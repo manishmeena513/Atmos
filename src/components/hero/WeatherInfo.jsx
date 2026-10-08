@@ -6,16 +6,14 @@ import {
   Sun,
   Star,
   Clock,
-  Share2,
   RefreshCw,
-  TrendingUp,
 } from 'lucide-react';
 import { useWeatherStore } from '../../store/weatherStore';
 import { getWmoInfo } from '../../utils/wmoCodeMap';
 import { generateDailyBriefData } from './DailyBrief';
 import { TemperatureDisplay } from './TemperatureDisplay';
 
-export function WeatherInfo({ current, daily, location, timezone, onOpenShare }) {
+export function WeatherInfo({ current, daily, location, timezone }) {
   const weather = useWeatherStore((s) => s.weather);
   const units = useWeatherStore((s) => s.units);
   const lastUpdated = useWeatherStore((s) => s.lastUpdated);
@@ -67,14 +65,14 @@ export function WeatherInfo({ current, daily, location, timezone, onOpenShare })
     try {
       const diffSec = Math.floor((Date.now() - new Date(lastUpdated).getTime()) / 1000);
       if (diffSec < 60) {
-        updatedStr = 'Updated just now';
+        updatedStr = 'Just now';
       } else if (diffSec < 3600) {
-        updatedStr = `Updated ${Math.floor(diffSec / 60)}m ago`;
+        updatedStr = `${Math.floor(diffSec / 60)}m ago`;
       } else {
-        updatedStr = `Updated at ${new Date(lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        updatedStr = new Date(lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       }
     } catch {
-      updatedStr = 'Updated recently';
+      updatedStr = 'Recently';
     }
   }
 
@@ -88,23 +86,26 @@ export function WeatherInfo({ current, daily, location, timezone, onOpenShare })
   };
 
   return (
-    <div className="flex flex-col space-y-3 sm:space-y-4">
-      {/* 1. Location Header Row: City, Country, Star Favorite & compact Share button */}
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2 min-w-0">
-          <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-sky-400 shrink-0 opacity-90" />
-          <span className="text-xl sm:text-2xl font-bold tracking-tight text-white truncate">
-            {location.name}
-          </span>
-          {location.country && (
-            <span className="text-sm sm:text-base text-slate-400 font-normal truncate">
-              · {location.country}
+    <div className="flex flex-col lg:grid lg:grid-cols-12 lg:items-end gap-5 lg:gap-8 w-full">
+      {/* LEFT COLUMN (Desktop): Temperature + Condition & Feel */}
+      <div className="lg:col-span-5 flex flex-col space-y-1.5 sm:space-y-2">
+        {/* Mobile-only Location Row (Top of screen) */}
+        <div className="flex lg:hidden items-center justify-between gap-2 mb-0.5">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <MapPin className="w-4 h-4 text-sky-400 shrink-0 opacity-90" />
+            <span className="text-lg sm:text-xl font-bold tracking-tight text-white truncate">
+              {location.name}
             </span>
-          )}
+            {location.country && (
+              <span className="text-xs sm:text-sm text-slate-400 font-normal truncate">
+                · {location.country}
+              </span>
+            )}
+          </div>
           <button
             onClick={toggleFav}
             aria-label={isFavorite ? 'Remove from favorites' : 'Save to favorites'}
-            className="p-1.5 rounded-full hover:bg-white/10 text-slate-400 hover:text-amber-400 transition-colors cursor-pointer shrink-0"
+            className="p-1 rounded-full text-slate-400 hover:text-amber-400 transition-colors cursor-pointer shrink-0"
           >
             <Star
               className={`w-4 h-4 transition-transform active:scale-125 ${
@@ -114,144 +115,162 @@ export function WeatherInfo({ current, daily, location, timezone, onOpenShare })
           </button>
         </div>
 
-        {/* Secondary Actions: Last Updated & Compact Share Button */}
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-slate-400">
-            <span>{updatedStr}</span>
+        {/* Primary Temperature Display (Single Instance) */}
+        <div
+          onClick={() => openDeepDive('temperature')}
+          className="cursor-pointer group select-none inline-block"
+          title="Tap to inspect temperature curve & thermal analysis"
+        >
+          <TemperatureDisplay tempCelsius={current.temperature_2m} />
+        </div>
+
+        {/* Condition & High/Low Range */}
+        <div
+          onClick={() => openDeepDive('temperature')}
+          className="space-y-0.5 cursor-pointer group"
+          title="Tap for detailed temperature analysis"
+        >
+          <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-white group-hover:text-sky-300 transition-colors">
+            {wmo.label}
+          </h2>
+          <div className="flex flex-wrap items-center gap-x-2 text-xs sm:text-sm text-slate-300">
+            <span className="font-semibold text-slate-100">
+              Feels like {feelsLike}°{units.temp}
+            </span>
+            <span className="text-slate-500">·</span>
+            <span className="text-slate-300">H: {highDisplay}°</span>
+            <span className="text-slate-500">·</span>
+            <span className="text-slate-300">L: {lowDisplay}°</span>
+          </div>
+        </div>
+      </div>
+
+      {/* RIGHT COLUMN (Desktop): Location Info + Daily Meaning + Essential Metrics */}
+      <div className="lg:col-span-7 flex flex-col space-y-3 sm:space-y-4">
+        {/* Desktop Location Header Row */}
+        <div className="hidden lg:flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <MapPin className="w-5 h-5 text-sky-400 shrink-0 opacity-90" />
+            <span className="text-2xl font-bold tracking-tight text-white truncate">
+              {location.name}
+            </span>
+            {location.country && (
+              <span className="text-base text-slate-400 font-normal truncate">
+                · {location.country}
+              </span>
+            )}
+            <button
+              onClick={toggleFav}
+              aria-label={isFavorite ? 'Remove from favorites' : 'Save to favorites'}
+              className="p-1.5 rounded-full hover:bg-white/10 text-slate-400 hover:text-amber-400 transition-colors cursor-pointer shrink-0 ml-1"
+            >
+              <Star
+                className={`w-4 h-4 transition-transform active:scale-125 ${
+                  isFavorite ? 'fill-amber-400 text-amber-400' : ''
+                }`}
+              />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-xs text-slate-400">
+            <span>Updated {updatedStr}</span>
             <button
               onClick={() => fetchData(location.lat, location.lon)}
               className="p-1 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors cursor-pointer"
               title="Refresh weather data"
               aria-label="Refresh weather data"
             >
-              <RefreshCw className="w-3 h-3" />
+              <RefreshCw className="w-3.5 h-3.5" />
             </button>
           </div>
-
-          {onOpenShare && (
-            <button
-              onClick={onOpenShare}
-              className="w-9 h-9 rounded-full bg-white/[0.08] hover:bg-white/[0.16] border border-white/10 flex items-center justify-center text-slate-200 hover:text-white transition-all cursor-pointer shadow-sm"
-              title="Share Weather Card"
-              aria-label="Share Weather Card"
-            >
-              <Share2 className="w-4 h-4 text-sky-400" />
-            </button>
-          )}
         </div>
-      </div>
 
-      {/* 2. Temperature Display: Responsive typography & tap to open deep-dive */}
-      <div
-        onClick={() => openDeepDive('temperature')}
-        className="py-0.5 inline-block cursor-pointer group"
-        title="Tap to view 24h temperature curve & thermal analysis"
-      >
-        <TemperatureDisplay tempCelsius={current.temperature_2m} />
-      </div>
+        {/* Daily Meaning Narrative */}
+        {brief?.narrative && (
+          <p className="text-xs sm:text-sm text-slate-200/90 leading-relaxed font-normal glass-panel rounded-2xl px-3.5 sm:px-4 py-2.5 sm:py-3">
+            &ldquo;{brief.narrative}&rdquo;
+          </p>
+        )}
 
-      {/* 3. Weather Condition & Range */}
-      <div
-        onClick={() => openDeepDive('temperature')}
-        className="space-y-1 cursor-pointer group"
-        title="Tap for detailed temperature analysis"
-      >
-        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white drop-shadow-md group-hover:text-sky-300 transition-colors">
-          {wmo.label}
-        </h2>
-        <div className="flex flex-wrap items-center gap-x-2 text-xs sm:text-sm text-slate-300">
-          <span className="font-semibold text-slate-100">
-            Feels like {feelsLike}°{units.temp}
-          </span>
-          <span className="text-slate-500">·</span>
-          <span className="text-slate-300">
-            H: {highDisplay}°
-          </span>
-          <span className="text-slate-500">·</span>
-          <span className="text-slate-300">
-            L: {lowDisplay}°
-          </span>
-          <span className="text-[10px] text-sky-400/80 ml-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            • Tap for deep-dive
-          </span>
-        </div>
-      </div>
+        {/* Essential Metrics: 2x2 on mobile, 4-col on tablet/desktop */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
+          {/* Humidity */}
+          <button
+            onClick={() => openDeepDive('humidity')}
+            className="glass-panel rounded-2xl p-2.5 sm:p-3 flex items-center gap-2.5 text-left cursor-pointer hover:border-sky-400/40 hover:bg-white/[0.08] transition-all group"
+            title="Tap for 24h humidity curve"
+          >
+            <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0 group-hover:scale-105 transition-transform">
+              <Droplets className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-medium group-hover:text-sky-300 transition-colors">
+                Humidity
+              </span>
+              <span className="text-sm sm:text-base font-bold text-white block leading-tight">
+                {current.relative_humidity_2m ?? '--'}%
+              </span>
+            </div>
+          </button>
 
-      {/* 4. Short Daily Explanation */}
-      {brief?.narrative && (
-        <p className="text-xs sm:text-sm text-slate-200/90 leading-relaxed font-normal glass-panel rounded-2xl px-4 py-3 max-w-2xl">
-          &ldquo;{brief.narrative}&rdquo;
-        </p>
-      )}
+          {/* Wind Speed */}
+          <button
+            onClick={() => openDeepDive('wind')}
+            className="glass-panel rounded-2xl p-2.5 sm:p-3 flex items-center gap-2.5 text-left cursor-pointer hover:border-sky-400/40 hover:bg-white/[0.08] transition-all group"
+            title="Tap for 24h wind velocity curve"
+          >
+            <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0 group-hover:scale-105 transition-transform">
+              <Wind className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-medium group-hover:text-sky-300 transition-colors">
+                Wind
+              </span>
+              <span className="text-sm sm:text-base font-bold text-white block leading-tight">
+                {windSpeedVal} {units.wind}
+              </span>
+            </div>
+          </button>
 
-      {/* 5. Essential Metrics: Clickable deep-dive cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-1">
-        {/* Humidity */}
-        <button
-          onClick={() => openDeepDive('humidity')}
-          className="glass-panel rounded-2xl p-2.5 sm:p-3 flex items-center gap-2.5 text-left cursor-pointer hover:border-sky-400/40 hover:bg-white/[0.08] transition-all group"
-          title="Tap for 24h humidity curve and moisture intelligence"
-        >
-          <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0 group-hover:scale-105 transition-transform">
-            <Droplets className="w-4 h-4" />
-          </div>
-          <div>
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-medium group-hover:text-sky-300 transition-colors">Humidity</span>
-            <span className="text-sm sm:text-base font-bold text-white block leading-tight">
-              {current.relative_humidity_2m ?? '--'}%
-            </span>
-          </div>
-        </button>
+          {/* UV Index */}
+          <button
+            onClick={() => openDeepDive('uv')}
+            className="glass-panel rounded-2xl p-2.5 sm:p-3 flex items-center gap-2.5 text-left cursor-pointer hover:border-amber-400/40 hover:bg-white/[0.08] transition-all group"
+            title="Tap for solar UV radiation curve"
+          >
+            <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 group-hover:scale-105 transition-transform">
+              <Sun className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-medium group-hover:text-amber-300 transition-colors">
+                UV Index
+              </span>
+              <span className="text-sm sm:text-base font-bold text-white block leading-tight">
+                {current.uv_index !== undefined && current.uv_index !== null
+                  ? current.uv_index.toFixed(1)
+                  : '0.0'}
+              </span>
+            </div>
+          </button>
 
-        {/* Wind Speed */}
-        <button
-          onClick={() => openDeepDive('wind')}
-          className="glass-panel rounded-2xl p-2.5 sm:p-3 flex items-center gap-2.5 text-left cursor-pointer hover:border-sky-400/40 hover:bg-white/[0.08] transition-all group"
-          title="Tap for 24h wind velocity curve and gust analysis"
-        >
-          <div className="w-8 h-8 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 shrink-0 group-hover:scale-105 transition-transform">
-            <Wind className="w-4 h-4" />
-          </div>
-          <div>
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-medium group-hover:text-sky-300 transition-colors">Wind</span>
-            <span className="text-sm sm:text-base font-bold text-white block leading-tight">
-              {windSpeedVal} {units.wind}
-            </span>
-          </div>
-        </button>
-
-        {/* UV Index */}
-        <button
-          onClick={() => openDeepDive('uv')}
-          className="glass-panel rounded-2xl p-2.5 sm:p-3 flex items-center gap-2.5 text-left cursor-pointer hover:border-amber-400/40 hover:bg-white/[0.08] transition-all group"
-          title="Tap for solar UV radiation curve and peak hours"
-        >
-          <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0 group-hover:scale-105 transition-transform">
-            <Sun className="w-4 h-4" />
-          </div>
-          <div>
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-medium group-hover:text-amber-300 transition-colors">UV Index</span>
-            <span className="text-sm sm:text-base font-bold text-white block leading-tight">
-              {current.uv_index !== undefined && current.uv_index !== null
-                ? current.uv_index.toFixed(1)
-                : '0.0'}
-            </span>
-          </div>
-        </button>
-
-        {/* Local Time */}
-        <div className="glass-panel rounded-2xl p-2.5 sm:p-3 flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
-            <Clock className="w-4 h-4" />
-          </div>
-          <div>
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-medium">Local Time</span>
-            <span className="text-sm sm:text-base font-bold text-white block leading-tight">
-              {localTimeStr}
-            </span>
+          {/* Local Time */}
+          <div className="glass-panel rounded-2xl p-2.5 sm:p-3 flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+              <Clock className="w-4 h-4" />
+            </div>
+            <div>
+              <span className="text-[10px] text-slate-400 uppercase tracking-wider block font-medium">
+                Local Time
+              </span>
+              <span className="text-sm sm:text-base font-bold text-white block leading-tight">
+                {localTimeStr}
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 }
+
+export default WeatherInfo;

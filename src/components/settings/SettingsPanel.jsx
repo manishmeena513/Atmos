@@ -7,22 +7,12 @@ import {
   Wind,
   Clock,
   Sparkles,
-  Layers,
-  Eye,
-  Check,
-  Zap,
 } from 'lucide-react';
 import { useWeatherStore } from '../../store/weatherStore';
 
-export function SettingsPanel({ isOpen, onClose }) {
+export function SettingsPanel({ isOpen, onClose, onOpenStudio }) {
   const units = useWeatherStore((s) => s.units);
   const setUnits = useWeatherStore((s) => s.setUnits);
-  const glassMode = useWeatherStore((s) => s.glassMode);
-  const toggleGlassMode = useWeatherStore((s) => s.toggleGlassMode);
-  const animationIntensity = useWeatherStore((s) => s.animationIntensity);
-  const setAnimationIntensity = useWeatherStore((s) => s.setAnimationIntensity);
-  const reducedMotion = useWeatherStore((s) => s.reducedMotion);
-  const setReducedMotion = useWeatherStore((s) => s.setReducedMotion);
 
   return (
     <AnimatePresence>
@@ -44,7 +34,7 @@ export function SettingsPanel({ isOpen, onClose }) {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: '100%', opacity: 0 }}
               transition={{ type: 'spring', damping: 30, stiffness: 320 }}
-              className="pointer-events-auto w-full sm:w-[440px] max-h-[90vh] sm:max-h-full bg-[#0c1322] border-t sm:border-t-0 sm:border-l border-white/10 shadow-2xl rounded-t-[28px] sm:rounded-none p-5 sm:p-6 overflow-y-auto flex flex-col justify-between"
+              className="pointer-events-auto w-full sm:w-[420px] max-h-[90vh] sm:max-h-full bg-[#0c1322] border-t sm:border-t-0 sm:border-l border-white/10 shadow-2xl rounded-t-[28px] sm:rounded-none p-5 sm:p-6 overflow-y-auto flex flex-col justify-between"
             >
               <div>
                 {/* Mobile Drag Handle */}
@@ -61,14 +51,14 @@ export function SettingsPanel({ isOpen, onClose }) {
                         Preferences
                       </h3>
                       <p className="text-xs text-slate-400">
-                        Customize telemetry units & visual environment
+                        Measurement units & meteorological standards
                       </p>
                     </div>
                   </div>
 
                   <button
                     onClick={onClose}
-                    className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+                    className="p-1.5 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -89,23 +79,23 @@ export function SettingsPanel({ isOpen, onClose }) {
                     <div className="flex rounded-xl bg-white/[0.04] p-1 border border-white/5">
                       <button
                         onClick={() => setUnits('temp', 'C')}
-                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                           units.temp === 'C'
-                            ? 'bg-sky-500 text-white shadow'
+                            ? 'bg-sky-500 text-slate-950 font-bold shadow'
                             : 'text-slate-400 hover:text-white'
                         }`}
                       >
-                        °C Celsius
+                        °C
                       </button>
                       <button
                         onClick={() => setUnits('temp', 'F')}
-                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                           units.temp === 'F'
-                            ? 'bg-sky-500 text-white shadow'
+                            ? 'bg-sky-500 text-slate-950 font-bold shadow'
                             : 'text-slate-400 hover:text-white'
                         }`}
                       >
-                        °F Fahrenheit
+                        °F
                       </button>
                     </div>
                   </div>
@@ -119,9 +109,9 @@ export function SettingsPanel({ isOpen, onClose }) {
                     <div className="flex rounded-xl bg-white/[0.04] p-1 border border-white/5">
                       <button
                         onClick={() => setUnits('wind', 'kmh')}
-                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                           units.wind === 'kmh'
-                            ? 'bg-sky-500 text-white shadow'
+                            ? 'bg-sky-500 text-slate-950 font-bold shadow'
                             : 'text-slate-400 hover:text-white'
                         }`}
                       >
@@ -129,9 +119,9 @@ export function SettingsPanel({ isOpen, onClose }) {
                       </button>
                       <button
                         onClick={() => setUnits('wind', 'mph')}
-                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                           units.wind === 'mph'
-                            ? 'bg-sky-500 text-white shadow'
+                            ? 'bg-sky-500 text-slate-950 font-bold shadow'
                             : 'text-slate-400 hover:text-white'
                         }`}
                       >
@@ -149,9 +139,9 @@ export function SettingsPanel({ isOpen, onClose }) {
                     <div className="flex rounded-xl bg-white/[0.04] p-1 border border-white/5">
                       <button
                         onClick={() => setUnits('clock', '24h')}
-                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                           units.clock === '24h'
-                            ? 'bg-sky-500 text-white shadow'
+                            ? 'bg-sky-500 text-slate-950 font-bold shadow'
                             : 'text-slate-400 hover:text-white'
                         }`}
                       >
@@ -159,9 +149,9 @@ export function SettingsPanel({ isOpen, onClose }) {
                       </button>
                       <button
                         onClick={() => setUnits('clock', '12h')}
-                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                        className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                           units.clock === '12h'
-                            ? 'bg-sky-500 text-white shadow'
+                            ? 'bg-sky-500 text-slate-950 font-bold shadow'
                             : 'text-slate-400 hover:text-white'
                         }`}
                       >
@@ -171,86 +161,27 @@ export function SettingsPanel({ isOpen, onClose }) {
                   </div>
                 </div>
 
-                {/* Section: Immersive Visuals */}
-                <div className="py-5 space-y-4 border-b border-white/5">
+                {/* Section: Centralized Personalization Hub Callout */}
+                <div className="py-5 space-y-3">
                   <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                    Atmospheric Immersion
+                    Appearance & Themes
                   </div>
-
-                  {/* Glass Window Mode Toggle */}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-sm font-medium text-slate-200 flex items-center gap-2">
-                        <Layers className="w-4 h-4 text-sky-400" />
-                        <span>Glass Window Mode</span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
-                        Overlays frosted pane with dripping condensation & parallax
-                      </p>
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-violet-600/15 via-sky-600/10 to-transparent border border-white/10 space-y-2.5">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-sky-400" />
+                      <h4 className="text-sm font-bold text-white">Atmos Studio</h4>
                     </div>
-
+                    <p className="text-xs text-slate-300 leading-relaxed">
+                      All visual customization—including 10 theme presets, frosted glass, typography styles, and dashboard reordering—is centralized in Atmos Studio.
+                    </p>
                     <button
-                      onClick={toggleGlassMode}
-                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                        glassMode ? 'bg-sky-500' : 'bg-slate-800'
-                      }`}
+                      onClick={() => {
+                        onClose();
+                        if (onOpenStudio) onOpenStudio();
+                      }}
+                      className="w-full py-2.5 px-3 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold text-xs transition-all cursor-pointer shadow-sm text-center"
                     >
-                      <span
-                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                          glassMode ? 'translate-x-5' : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
-                  </div>
-
-                  {/* Animation Intensity */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between text-sm text-slate-200">
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-sky-400" />
-                        <span>Particle & Effect Intensity</span>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {['full', 'reduced', 'minimal'].map((mode) => (
-                        <button
-                          key={mode}
-                          onClick={() => setAnimationIntensity(mode)}
-                          className={`py-2 px-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all ${
-                            animationIntensity === mode
-                              ? 'bg-sky-500 text-white shadow'
-                              : 'bg-white/[0.04] text-slate-400 hover:text-white'
-                          }`}
-                        >
-                          {mode}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Reduced Motion Override */}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-sm font-medium text-slate-200 flex items-center gap-2">
-                        <Eye className="w-4 h-4 text-sky-400" />
-                        <span>Reduced Motion</span>
-                      </div>
-                      <p className="text-[11px] text-slate-400 mt-0.5">
-                        Disables canvas particles and high-frequency animations
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => setReducedMotion(!reducedMotion)}
-                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                        reducedMotion ? 'bg-sky-500' : 'bg-slate-800'
-                      }`}
-                    >
-                      <span
-                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                          reducedMotion ? 'translate-x-5' : 'translate-x-0'
-                        }`}
-                      />
+                      Open Atmos Studio
                     </button>
                   </div>
                 </div>
@@ -260,15 +191,14 @@ export function SettingsPanel({ isOpen, onClose }) {
               <div className="pt-6 border-t border-white/10 text-[11px] text-slate-500 space-y-1">
                 <div className="flex items-center justify-between">
                   <span>Provider</span>
-                  <span className="text-slate-400 font-medium">Open-Meteo (Keyless)</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Architecture</span>
-                  <span className="text-slate-400 font-medium">Vercel Serverless Ready</span>
+                  <span className="text-slate-400 font-medium">Open-Meteo High-Resolution</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Version</span>
-                  <span className="text-slate-400 font-mono">Atmos v1.0 (Phase 1)</span>
+                  <span className="text-slate-400 font-mono">Atmos V2.5</span>
+                </div>
+                <div className="text-center pt-2 text-slate-600">
+                  Developed by Manish Meena
                 </div>
               </div>
             </motion.div>
@@ -278,3 +208,5 @@ export function SettingsPanel({ isOpen, onClose }) {
     </AnimatePresence>
   );
 }
+
+export default SettingsPanel;
